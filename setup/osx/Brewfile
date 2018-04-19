@@ -1,0 +1,20 @@
+cask_args appdir: '/Applications'
+
+tap 'homebrew/bundle'
+tap 'homebrew/services'
+tap 'caskroom/cask'
+tap 'caskroom/versions'
+
+brew 'bash'
+brew 'bash-completion'
+
+brew 'python3'
+brew 'java8'
+
+cask 'docker'
+cask 'keybase'
+
+cask 'google-chrome'
+cask '1password'
+cask 'dropbox'
+
