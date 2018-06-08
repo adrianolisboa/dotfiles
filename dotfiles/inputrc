@@ -2,11 +2,11 @@ set editing-mode vi
 set bell-style none
 
 $if mode=vi
-	set keymap vi-command
-	set keymap vi-insert
-	"gb": beginning-of-history
-	"G": end-of-history
-	"jj": vi-movement-mode
-	"\C-w": backward-kill-word
-	"\C-p": history-search-backward
+    set keymap vi-command
+    set keymap vi-insert
+#"gb": beginning-of-history
+#"G": end-of-history
+#"jj": vi-movement-mode
+#"\C-w": backward-kill-word
+#"\C-p": history-search-backward
 $endif
