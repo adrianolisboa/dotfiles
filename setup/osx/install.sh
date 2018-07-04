@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+###############################################################################
+# OSX custom settings                                                         #
+###############################################################################
+
 # Define OSX KeyBoard velocity
 defaults write -g InitialKeyRepeat -int 10 # normal minimum is 15 (225 ms)
 defaults write -g KeyRepeat -int 1 # normal minimum is 2 (30 ms)
@@ -70,10 +74,18 @@ chflags nohidden ~/Library
 # Show the /Volumes folder
 sudo chflags nohidden /Volumes
 
-#### Dock
-
 # Automatically hide and show the Dock
 defaults write com.apple.dock autohide -bool true
 
 # Make Dock icons of hidden applications translucent
 defaults write com.apple.dock showhidden -bool true
+
+###############################################################################
+# Homebrew setup                                                              #
+###############################################################################
+
+# Install Homebrew 
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+# Download dependencies
+brew bundle
