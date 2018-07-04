@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-directory=$(pwd)
+directory=$( dirname "${BASH_SOURCE[0]}" )
 
 # Specify the preferences directory
 defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string $directory
