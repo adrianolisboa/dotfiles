@@ -1,0 +1,20 @@
+[user]
+	name = Adriano Lisboa
+	email = alisboa@thoughtworks.com
+[color]
+	ui = true
+[merge]
+	tool = diffmerge
+[core]
+	editor = vim 
+[pull]
+  rebase = true
+[push]
+	default = simple
+[credential]
+	helper = osxkeychain
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
