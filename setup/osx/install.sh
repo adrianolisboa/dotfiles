@@ -84,8 +84,14 @@ defaults write com.apple.dock showhidden -bool true
 # Homebrew setup                                                              #
 ###############################################################################
 
-# Install Homebrew 
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+read -p "Install homebrew and its dependencies? (y or n) " -n 1 -r
+echo
 
-# Download dependencies
-brew bundle
+if [[ ! $REPLY =~ ^[Nn]$ ]]
+then
+    # Install Homebrew
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+    # Download dependencies
+    brew bundle
+fi
