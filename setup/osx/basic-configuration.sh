@@ -83,18 +83,3 @@ defaults write com.apple.dock autohide -bool true
 # Make Dock icons of hidden applications translucent
 defaults write com.apple.dock showhidden -bool true
 
-###############################################################################
-# Homebrew setup                                                              #
-###############################################################################
-
-read -p "Install homebrew and its dependencies? (y or n) " -n 1 -r
-echo
-
-if [[ ! $REPLY =~ ^[Nn]$ ]]
-then
-    # Install Homebrew
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-
-    # Download dependencies
-    brew bundle
-fi
