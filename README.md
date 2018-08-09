@@ -21,4 +21,4 @@ Creating a link for the dotfiles
 
 According to our SO run:
 
-    ~/.env-setup/setup/[our so]/install.sh 
+    ~/.env-setup/setup/[our so]/setup.sh
