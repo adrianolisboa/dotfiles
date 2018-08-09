@@ -23,6 +23,7 @@ brew "node"
 brew "openconnect"
 brew "terraform"
 brew "the_silver_searcher"
+brew "neofetch"
 
 cask "google-chrome"
 cask "dropbox"
