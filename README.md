@@ -1,3 +1,5 @@
+[![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/adrianolisboa)
+
 ## Environment Setup
 
 This repository contains everything that I need to setup a new environment. Like my `dotfiles` and `setup` files for each env.
