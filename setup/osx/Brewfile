@@ -25,6 +25,7 @@ brew "terraform"
 brew "the_silver_searcher"
 brew "neofetch"
 brew "bat"
+brew "tldr"
 
 cask "google-chrome"
 cask "dropbox"
