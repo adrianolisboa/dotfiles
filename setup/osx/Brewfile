@@ -26,6 +26,7 @@ brew "the_silver_searcher"
 brew "neofetch"
 brew "bat"
 brew "tldr"
+brew "terminal-notifier"
 
 cask "google-chrome"
 cask "dropbox"
