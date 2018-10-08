@@ -27,6 +27,7 @@ brew "neofetch"
 brew "bat"
 brew "tldr"
 brew "terminal-notifier"
+brew "selecta"
 
 cask "google-chrome"
 cask "dropbox"
