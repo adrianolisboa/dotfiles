@@ -28,6 +28,7 @@ brew "bat"
 brew "tldr"
 brew "terminal-notifier"
 brew "selecta"
+brew "pass"
 
 cask "google-chrome"
 cask "dropbox"
