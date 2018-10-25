@@ -24,6 +24,7 @@ brew "tldr"
 brew "terminal-notifier"
 brew "selecta"
 brew "pass"
+brew "wifi-password"
 
 cask "google-chrome"
 cask "firefox"
