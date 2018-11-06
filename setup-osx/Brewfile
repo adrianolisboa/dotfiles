@@ -25,6 +25,7 @@ brew "terminal-notifier"
 brew "selecta"
 brew "pass"
 brew "wifi-password"
+brew "httpie"
 
 cask "google-chrome"
 cask "firefox"
