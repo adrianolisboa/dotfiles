@@ -27,6 +27,7 @@ brew "pass"
 brew "wifi-password"
 brew "httpie"
 
+cask "macdown"
 cask "google-chrome"
 cask "firefox"
 cask "dropbox"
