@@ -6,6 +6,7 @@ tap "homebrew/services"
 tap "caskroom/versions"
 tap "caskroom/cask"
 
+brew "macvim", args: ["with-client-server"]
 brew "adr-tools"
 brew "readline"
 brew "bash"
