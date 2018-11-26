@@ -27,6 +27,7 @@ brew "selecta"
 brew "pass"
 brew "wifi-password"
 brew "httpie"
+brew "thefuck"
 
 cask "macdown"
 cask "google-chrome"
