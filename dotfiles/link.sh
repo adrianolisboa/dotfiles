@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm -f ~/.bashrc ~/.inputrc ~/.gitconfig ~/.gitexcludes
+rm -f ~/.bashrc ~/.inputrc ~/.gitconfig ~/.gitexcludes ~/.tmux.conf
 
 ln -s .env-setup/dotfiles/bashrc ~/.bashrc
 ln -s .env-setup/dotfiles/inputrc ~/.inputrc
