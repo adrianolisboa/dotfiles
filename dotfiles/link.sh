@@ -1,9 +1,0 @@
-#!/bin/bash
-
-rm -f ~/.bashrc ~/.inputrc ~/.gitconfig ~/.gitexcludes ~/.tmux.conf
-
-ln -s .env-setup/dotfiles/bashrc ~/.bashrc
-ln -s .env-setup/dotfiles/inputrc ~/.inputrc
-ln -s .env-setup/dotfiles/gitconfig ~/.gitconfig
-ln -s .env-setup/dotfiles/gitexcludes ~/.gitexcludes
-ln -s .env-setup/dotfiles/tmux.conf ~/.tmux.conf
