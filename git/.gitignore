@@ -1,3 +1,3 @@
-.DS_Store
-.bundle
-.byebug_history
+pack/minpac/opt/minpac
+pack/minpac/start
+.netrwhist*
