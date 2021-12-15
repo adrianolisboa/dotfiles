@@ -1,7 +1,11 @@
-[user]
-    name = Adriano Lisboa
-    email = adrianolic@gmail.com
-    signinkey = Adriano Lisboa <adrianolic@gmail.com>
+[includeIf "gitdir:~/PersonalProjects/"]
+    path = .gitconfig-personal
+[includeIf "gitdir:~/dotfiles/"]
+    path = .gitconfig-personal
+[includeIf "gitdir:~/.vim/"]
+    path = .gitconfig-personal
+[includeIf "gitdir:~/Projects/"]
+    path = .gitconfig-professional
 [color]
 	ui = true
 [merge]
@@ -11,7 +15,7 @@
 [pull]
   rebase = true
 [push]
-	default = simple
+	default = current
 [credential]
 	helper = osxkeychain
 [filter "lfs"]
