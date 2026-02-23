@@ -1,13 +1,24 @@
 [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/adrianolisboa)
 
-This repository contains all of my dotfiles
+This repository contains dotfiles managed with GNU Stow.
 
-### Installing
+### Install on a fresh macOS machine (2026)
 
-My dotfiles are managed using [GNU Stow](https://www.gnu.org/software/stow/). 
+```bash
+git clone git@github.com:adrianolisboa/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+./install.sh
+```
 
-To get started, clone this repository into the your home directory
+`install.sh` will:
+- Ensure Homebrew is installed.
+- Install GNU Stow if needed.
+- Back up conflicting existing files to `~/.dotfiles-backup/<timestamp>/`.
+- Symlink all managed packages (`git`, `bash`, `input`, `tmux`) into `$HOME`.
 
-    git clone git@github.com:adrianolisboa/dotfiles.git ~/dotfiles
+### Manual usage
 
-Run `cd` into it, and run `stow git` to symlink the necessary files.
+```bash
+cd ~/dotfiles
+stow --target "$HOME" git bash input tmux
+```
