@@ -1,0 +1,40 @@
+# vim: ft=zsh sw=2 ts=2 expandtab
+
+# Set default text editors
+export VISUAL="vim"
+export EDITOR="$VISUAL"
+# export TMPDIR=/tmp  # Uncomment if needed
+
+# Enable colors in macOS Terminal (works in Zsh)
+export CLICOLOR=1
+export LSCOLORS="gxBxhxDxfxhxhxhxhxcxcx"
+
+# Load vcs_info for Git branch detection
+#
+# Find and set branch name var if in git repository.
+function git_branch_name()
+{
+  branch=$(git symbolic-ref HEAD 2> /dev/null | awk 'BEGIN{FS="/"} {print $NF}')
+  if [[ $branch == "" ]];
+  then
+    :
+  else
+    echo '('$branch')'
+  fi
+}
+
+# Enable substitution in the prompt.
+setopt prompt_subst
+
+# Set the Zsh Prompt with Git branch
+PS1='%F{magenta}%n %F{green}%1~ %F{yellow}$(git_branch_name)
+%F{yellow}»%f '
+
+# Set CDPATH for easier navigation
+export CDPATH="$HOME"
+
+# Start SSH agent and add GitHub key automatically
+if [ -z "$SSH_AUTH_SOCK" ]; then
+  eval "$(ssh-agent -s)" > /dev/null
+  ssh-add ~/.ssh/id_github 2>/dev/null
+fi

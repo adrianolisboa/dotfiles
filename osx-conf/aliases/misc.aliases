@@ -1,0 +1,29 @@
+# vim: ft=sh sw=2 ts=2 expandtab
+
+# Directory aliases
+alias ..='cd ..'         # Go up one directory
+alias cd..='cd ..'       # Common misspelling for going up one directory
+alias ...='cd ../..'     # Go up two directories
+alias ....='cd ../../..' # Go up three directories
+
+# change habits (ask myself for confirmation with every sudo)
+alias sudo=safe_sudo
+
+# protection from myself
+alias rm='rm -i'
+alias rmf='rm -rfi'
+alias mv='mv -i'
+
+alias epoch='date +"%s"'
+alias path='echo -e ${PATH//:/\\n}' # nice path printing
+
+# Usefully
+alias envg='env | grep $1'
+alias cat='bat --paging=never --style=plain'
+alias psg="ps auxwww | head -n 1 ; ps auxwww | grep -Ei"
+alias ping='prettyping --nolegend'
+alias help='tldr'
+alias macversion='sw_vers'
+
+alias jsonv='python -m json.tool '
+alias githubssh='eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_github'

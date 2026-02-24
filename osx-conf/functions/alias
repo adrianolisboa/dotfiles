@@ -1,0 +1,24 @@
+# vim: ft=sh sw=2 ts=2 expandtab
+
+# Function to list aliases in a readable format
+list_aliases() {
+  alias | grep "$1" | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/" | sed "s/['|\']//g" | sort
+}
+
+# Define aliases for listing aliases
+alias aliases='list_aliases'
+alias al='list_aliases'
+
+# This confirm function works correctly in Zsh
+confirm() {
+  local confirmation_phrase="${1:-Are you sure?}"
+  local prompt="${2:-$confirmation_phrase [y/N]} "
+
+  echo -n "$prompt"
+  read response
+
+  case "$response" in
+    [yY][eE][sS]|[yY]) return 0 ;;  # True (confirmation accepted)
+    *) return 1 ;;  # False (confirmation denied)
+  esac
+}
