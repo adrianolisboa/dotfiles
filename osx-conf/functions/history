@@ -1,0 +1,32 @@
+# vim: ft=zsh sw=2 ts=2 expandtab
+
+# History Size: Large enough to remember thousands of commands
+export HISTSIZE=100000
+export HISTFILESIZE=100000
+export HISTFILE=~/.zsh_history
+
+# Ignore certain commands from history
+export HISTIGNORE="clear:bg:fg:exit:* --help"
+
+# Enable Erlang Shell History
+export ERL_AFLAGS="-kernel shell_history enabled -kernel shell_history_file_bytes 2097152"
+
+# Ensure history is properly managed
+setopt APPEND_HISTORY       # Append history instead of overwriting
+setopt INC_APPEND_HISTORY   # Write history incrementally after each command
+setopt SHARE_HISTORY        # Share history across multiple Zsh sessions
+setopt HIST_IGNORE_ALL_DUPS # Remove duplicate history entries
+setopt HIST_REDUCE_BLANKS   # Ignore redundant spaces in history
+
+# Alias to refresh history in Zsh
+alias hh='echo "Refreshing history"; fc -AI'
+
+# Improved history search function
+hf() {
+  history | grep -i "${1:-"."}" | tail -r -n 10000 | fzf --height 40% --reverse --border | awk '{ $1=""; print $0 }' | xargs -I{} echo "{}"
+}
+
+# Show most frequently used commands
+histfreq() {
+  history | awk '{a[$2]++}END{for(i in a){print a[i] " " i}}' | sort -rn | head -n 15
+}

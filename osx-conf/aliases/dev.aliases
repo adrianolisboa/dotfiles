@@ -1,0 +1,4 @@
+# vim: ft=sh sw=2 ts=2 expandtab
+
+alias github='open https://www.github.com'
+alias mygithub='open https://www.github.com/adrianolisboa'

@@ -1,0 +1,13 @@
+# vim: ft=sh sw=2 ts=2 expandtab
+
+alias ni="npm install"
+alias nu="npm uninstall"
+alias nit="npm init -y"
+alias nis="npm install --save"
+alias nid="npm install --save-dev"
+alias nig="npm install -g"
+
+alias nst="npm start"
+alias nrb="npm run build"
+alias nt="npm test"
+alias nre="npm run eject"

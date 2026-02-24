@@ -1,0 +1,16 @@
+# vim: ft=sh sw=2 ts=2 expandtab
+
+alias tm='tmux'
+alias tmat='create_if_needed_and_attach'
+alias tmns='tmux new -s'
+alias tma='tmux attach -t'
+alias tms='tmux switch -t'
+alias tmls='tmux list-sessions'
+alias tmd='tmux detach'
+alias tmnw='tmux new-window'
+alias tmsw='tmux select-window -t'
+alias tmrw='tmux rename-window'
+alias tmrw='tmux rename-window'
+alias tmkas='tmux kill-session -a'
+alias tmwork='tmux attach -t workflow || tmux new -s workflow'
+alias tmbase='tmux attach -t base || tmux new -s base'

@@ -1,0 +1,40 @@
+# vim: ft=sh sw=2 ts=2 expandtab
+
+# mix
+alias mixt="mix test"
+alias mixc="mix credo --strict"
+alias mixr="mix run -e"
+alias mixtc="mix test --cover"
+alias mixco="mix compile"
+alias mixcl="mix clean"
+alias mixclco="mix do clean compile"
+alias mixdg="mix deps.get"
+alias mixes="mix ecto.setup"
+alias mixdc="mix docs"
+alias mixes='mix format && mix format --check-formatted && mix test && mix credo --strict && mix coveralls -u' # thanks @brosquinha
+alias mmig='mix ecto.migrate && MIX_ENV=test mix ecto.migrate'
+
+# phoenix
+alias mixphx="iex -S mix phx.server"
+
+# iex
+alias iexm="iex -S mix"
+alias iexp="iex -S mix phx.server"
+
+# gigalixir
+alias giga="gigalixir"
+alias gigar="gigalixir run"
+alias gigaa="gigalixir apps"
+alias gigal="gigalixir logs"
+alias gigaps="gigalixir ps"
+alias gigaseeds="gigalixir run -- mix run priv/repo/seeds.exs"
+
+
+mixroutes() {
+  local query="$1"
+  if [[ -n "$query" ]]; then
+    mix phx.routes | grep --ignore-case --color=always "$query" | fzf --ansi --preview='echo {}'
+  else
+    mix phx.routes | fzf --ansi --preview='echo {}'
+  fi
+}

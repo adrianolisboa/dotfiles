@@ -1,0 +1,15 @@
+# vim: ft=sh sw=2 ts=2 expandtab
+
+# yarn
+alias yst="yarn start"
+alias yb="yarn build"
+alias ylt="yarn lint"
+alias yt="yarn test"
+alias ytw="yarn test:watch"
+alias ytc="yarn test:coverage"
+
+# tsdx
+alias tsb="yarn tsdx:build"
+alias tsw="yarn tsdx:watch"
+alias tsl="yarn tsdx lint src"
+alias tslf="yarn tsdx lint src --fix"

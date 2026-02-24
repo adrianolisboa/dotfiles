@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+echo "${C_YELLOW}What are you really trying to do? Are you sure that you want to run 'sudo ${*}'? (Y/N)"
+select yn in "Yes" "No"; do
+  case $yn in
+    Yes)
+      \sudo ${*}
+      break;;
+    No)
+      break;;
+  esac
+done
+

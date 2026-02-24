@@ -1,0 +1,4 @@
+# vim: ft=sh sw=2 ts=2 expandtab
+
+# Turn off auto-correct of the 'cd' command when a directory is mis-spelled
+setopt APPEND_HISTORY
