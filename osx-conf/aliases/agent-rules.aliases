@@ -1,0 +1,4 @@
+# vim: ft=sh sw=2 ts=2 expandtab
+
+# agent-rules CLI
+alias agr='$HOME/Projects/agent-rules/agent-rules'
