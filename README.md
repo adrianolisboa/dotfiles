@@ -14,7 +14,6 @@ That command orchestrates all phases, saves progress, and can pause between phas
 ## Setup behavior
 
 - Runs in phases (`xcode_clt`, `homebrew`, `stow`, `backup`, `migrate_legacy`, `apply_dotfiles`, `shell_loader`, `brew_bundle`, `macos_defaults`, `iterm2`).
-- Runs in phases (`xcode_clt`, `homebrew`, `stow`, `backup`, `migrate_legacy`, `apply_dotfiles`, `shell_loader`, `brew_bundle`, `macos_defaults`, `iterm2`, `cursor_profile`).
 - Saves state at `~/.local/state/macforge/setup.state`.
 - If interrupted, re-run the same command to resume.
 - Prompts before moving to the next phase (use `--yes` for non-interactive mode).
@@ -26,7 +25,6 @@ That command orchestrates all phases, saves progress, and can pause between phas
 ./macforge phases
 ./macforge doctor
 ./macforge hooks
-./macforge cursor-profile
 ./macforge setup --yes
 ./macforge setup --from brew_bundle
 ./macforge setup --until apply_dotfiles
@@ -66,6 +64,21 @@ chmod 600 "$HOME/.config/macforge/secrets.zsh"
 
 Then place private exports in that file (for example API keys).
 
+## Syncing between computers
+
+macforge is the source of truth for your config. To keep other machines in sync:
+
+1. **On the machine where you changed config:** commit and push macforge (e.g. `git push`).
+2. **On each other machine:** pull and re-run setup so symlinks and state are updated:
+
+   ```bash
+   cd ~/Projects/macforge
+   git pull
+   ./macforge setup
+   ```
+
+After a `git pull`, running `./macforge setup` skips phases already completed (state is in `~/.local/state/macforge/setup.state`).
+
 ## Security hook
 
 Install a pre-push hook that runs `gitleaks`:
@@ -75,13 +88,3 @@ Install a pre-push hook that runs `gitleaks`:
 ```
 
 The hook blocks push if potential secrets are detected in the outgoing commit range.
-
-## Cursor profile
-
-`./macforge cursor-profile` applies the versioned global Cursor profile in `cursor-profile/`:
-
-- `User/settings.json`
-- `User/keybindings.json`
-- `extensions.txt`
-
-The command writes the files into `~/Library/Application Support/Cursor/User` and installs or updates the listed extensions through the Cursor CLI when it is available.
