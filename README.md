@@ -58,6 +58,21 @@ chmod 600 "$HOME/.config/macforge/secrets.zsh"
 
 Then place private exports in that file (for example API keys).
 
+## Work / professional git identity
+
+`~/.gitconfig` (stowed from `git/.gitconfig`) includes `~/.gitconfig-professional` when the repo is under `~/Projects/`. That professional file is **not** tracked in macforge — keep it as a local file per machine to avoid leaking a work email into a public repo:
+
+```bash
+cat > "$HOME/.gitconfig-professional" <<'EOF'
+[user]
+    name = Your Name
+    email = you@work.example
+    signingkey = Your Name <you@work.example>
+EOF
+```
+
+`~/.gitconfig-personal` (for personal repos) stays tracked in macforge because its content is already intentionally public.
+
 ## Syncing between computers
 
 macforge is the source of truth for your config. To keep other machines in sync:

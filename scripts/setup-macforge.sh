@@ -219,7 +219,6 @@ managed_source_path() {
   case "$file" in
     .gitconfig) printf '%s\n' "$REPO_ROOT/git/.gitconfig" ;;
     .gitconfig-personal) printf '%s\n' "$REPO_ROOT/git/.gitconfig-personal" ;;
-    .gitconfig-professional) printf '%s\n' "$REPO_ROOT/git/.gitconfig-professional" ;;
     .gitignore) printf '%s\n' "$REPO_ROOT/git/.gitignore" ;;
     .zshrc) printf '%s\n' "$REPO_ROOT/zsh/.zshrc" ;;
     .inputrc) printf '%s\n' "$REPO_ROOT/input/.inputrc" ;;

@@ -7,7 +7,6 @@ PACKAGES=(git zsh input tmux)
 MANAGED_FILES=(
   ".gitconfig"
   ".gitconfig-personal"
-  ".gitconfig-professional"
   ".gitignore"
   ".zshrc"
   ".inputrc"
