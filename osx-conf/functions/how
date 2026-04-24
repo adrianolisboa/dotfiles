@@ -1,5 +1,4 @@
-set -o vi
-set -o ignoreeof
+# vim: ft=sh sw=2 ts=2 expandtab
 
 how() {
   claude --model haiku -p "Answer concisely and briefly: how $*"

@@ -10,8 +10,6 @@ source "$REPO_ROOT/config/macforge.sh"
 
 ZSHRC_PATH="${ZSHRC_PATH:-$HOME/.zshrc}"
 LOAD_ROOT_PATH="$REPO_ROOT/osx-conf"
-SHELL_LOADER_MARKER_BEGIN="# >>> macforge shell loader >>>"
-SHELL_LOADER_MARKER_END="# <<< macforge shell loader <<<"
 SECRETS_FILE="${HOME}/.config/macforge/secrets.zsh"
 
 FAILURES=0
@@ -38,7 +36,7 @@ managed_source_path() {
     .gitconfig-personal) printf '%s\n' "$REPO_ROOT/git/.gitconfig-personal" ;;
     .gitconfig-professional) printf '%s\n' "$REPO_ROOT/git/.gitconfig-professional" ;;
     .gitignore) printf '%s\n' "$REPO_ROOT/git/.gitignore" ;;
-    .bashrc) printf '%s\n' "$REPO_ROOT/bash/.bashrc" ;;
+    .zshrc) printf '%s\n' "$REPO_ROOT/zsh/.zshrc" ;;
     .inputrc) printf '%s\n' "$REPO_ROOT/input/.inputrc" ;;
     .tmux.conf) printf '%s\n' "$REPO_ROOT/tmux/.tmux.conf" ;;
     *) return 1 ;;
@@ -58,21 +56,6 @@ resolve_link_target_abs() {
     printf '%s\n' "$raw_target"
   else
     printf '%s/%s\n' "$(CDPATH= cd "$(dirname "$link_path")" && CDPATH= cd "$(dirname "$raw_target")" && pwd -P)" "$(basename "$raw_target")"
-  fi
-}
-
-check_loader_block() {
-  if [[ ! -f "$ZSHRC_PATH" ]]; then
-    fail "$ZSHRC_PATH does not exist."
-    return
-  fi
-
-  if grep -Fxq "$SHELL_LOADER_MARKER_BEGIN" "$ZSHRC_PATH" &&
-    grep -Fxq "$SHELL_LOADER_MARKER_END" "$ZSHRC_PATH" &&
-    grep -Fq "LOAD_ROOT=\"$LOAD_ROOT_PATH\"" "$ZSHRC_PATH"; then
-    pass "macforge loader block is present in $ZSHRC_PATH."
-  else
-    fail "macforge loader block missing or outdated in $ZSHRC_PATH. Run './macforge setup --from shell_loader --until shell_loader'."
   fi
 }
 
@@ -204,7 +187,6 @@ main() {
   echo "Repo: $REPO_ROOT"
   echo
 
-  check_loader_block
   check_resolvable_tools
   check_alias_duplicates
   check_optional_modules
