@@ -2,6 +2,10 @@
     path = .gitconfig-personal
 [includeIf "gitdir:~/Projects/"]
     path = .gitconfig-professional
+[includeIf "gitdir:~/Projects/macforge/"]
+    path = .gitconfig-personal
+[includeIf "gitdir:~/.vim/"]
+    path = .gitconfig-personal
 [color]
 	ui = true
 [core]

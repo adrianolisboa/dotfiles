@@ -14,10 +14,7 @@ BREWFILE_OPTIONAL_PATH="$REPO_ROOT/$BREWFILE_OPTIONAL_REL"
 ITERM_PLIST_PATH="$REPO_ROOT/$ITERM_PLIST_REL"
 STATE_DIR="${MACFORGE_STATE_DIR:-${WORKSTATION_STATE_DIR:-$STATE_DIR_DEFAULT}}"
 STATE_FILE="$STATE_DIR/$STATE_FILE_NAME"
-ZSHRC_PATH="${ZSHRC_PATH:-$HOME/.zshrc}"
 INSTALL_OPTIONAL_BREW="${MACFORGE_INSTALL_OPTIONAL_BREW:-0}"
-SHELL_LOADER_MARKER_BEGIN="# >>> macforge shell loader >>>"
-SHELL_LOADER_MARKER_END="# <<< macforge shell loader <<<"
 
 AUTO_YES=0
 FROM_PHASE=""
@@ -32,7 +29,6 @@ PHASES=(
   "backup"
   "migrate_legacy"
   "apply_dotfiles"
-  "shell_loader"
   "brew_bundle"
   "macos_defaults"
   "iterm2"
@@ -223,9 +219,8 @@ managed_source_path() {
   case "$file" in
     .gitconfig) printf '%s\n' "$REPO_ROOT/git/.gitconfig" ;;
     .gitconfig-personal) printf '%s\n' "$REPO_ROOT/git/.gitconfig-personal" ;;
-    .gitconfig-professional) printf '%s\n' "$REPO_ROOT/git/.gitconfig-professional" ;;
     .gitignore) printf '%s\n' "$REPO_ROOT/git/.gitignore" ;;
-    .bashrc) printf '%s\n' "$REPO_ROOT/bash/.bashrc" ;;
+    .zshrc) printf '%s\n' "$REPO_ROOT/zsh/.zshrc" ;;
     .inputrc) printf '%s\n' "$REPO_ROOT/input/.inputrc" ;;
     .tmux.conf) printf '%s\n' "$REPO_ROOT/tmux/.tmux.conf" ;;
     *) return 1 ;;
@@ -293,42 +288,6 @@ apply_stow() {
   cd "$REPO_ROOT"
   stow --restow --target "$TARGET_DIR" "${PACKAGES[@]}"
   log "[apply_dotfiles] Done."
-}
-
-install_shell_loader() {
-  log "[shell_loader] Ensuring shell loader in $ZSHRC_PATH..."
-
-  local loader_dir loader_file
-  loader_dir="$REPO_ROOT/osx-conf"
-  loader_file="$loader_dir/load"
-
-  if [[ ! -f "$loader_file" ]]; then
-    log "[shell_loader] Missing loader at $loader_file. Skipping."
-    return
-  fi
-
-  mkdir -p "$(dirname "$ZSHRC_PATH")"
-  touch "$ZSHRC_PATH"
-
-  local tmp_file
-  tmp_file="$(mktemp)"
-
-  awk -v begin="$SHELL_LOADER_MARKER_BEGIN" -v end="$SHELL_LOADER_MARKER_END" '
-    $0 == begin {in_block=1; next}
-    $0 == end {in_block=0; next}
-    !in_block {print}
-  ' "$ZSHRC_PATH" > "$tmp_file"
-
-  cat >> "$tmp_file" <<EOF
-
-$SHELL_LOADER_MARKER_BEGIN
-LOAD_ROOT="$loader_dir"
-. "\${LOAD_ROOT}/load"
-$SHELL_LOADER_MARKER_END
-EOF
-
-  mv "$tmp_file" "$ZSHRC_PATH"
-  log "[shell_loader] Updated $ZSHRC_PATH."
 }
 
 install_brew_dependencies() {
@@ -403,7 +362,6 @@ run_phase() {
     backup) backup_conflicts ;;
     migrate_legacy) migrate_legacy_links ;;
     apply_dotfiles) apply_stow ;;
-    shell_loader) install_shell_loader ;;
     brew_bundle) install_brew_dependencies ;;
     macos_defaults) apply_macos_preferences ;;
     iterm2) configure_iterm2 ;;

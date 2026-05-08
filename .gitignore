@@ -1,0 +1,4 @@
+# Never commit the professional git identity; keep it as a machine-local
+# file at ~/.gitconfig-professional instead.
+git/.gitconfig-professional
+.gitconfig-professional

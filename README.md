@@ -13,7 +13,7 @@ That command orchestrates all phases, saves progress, and can pause between phas
 
 ## Setup behavior
 
-- Runs in phases (`xcode_clt`, `homebrew`, `stow`, `backup`, `migrate_legacy`, `apply_dotfiles`, `shell_loader`, `brew_bundle`, `macos_defaults`, `iterm2`).
+- Runs in phases (`xcode_clt`, `homebrew`, `stow`, `backup`, `migrate_legacy`, `apply_dotfiles`, `brew_bundle`, `macos_defaults`, `iterm2`).
 - Saves state at `~/.local/state/macforge/setup.state`.
 - If interrupted, re-run the same command to resume.
 - Prompts before moving to the next phase (use `--yes` for non-interactive mode).
@@ -38,15 +38,9 @@ That command orchestrates all phases, saves progress, and can pause between phas
 - `osx-conf/Brewfile.optional`: optional/legacy tools.
 - Optional tools are installed only with `--with-optional-brew` (or `MACFORGE_INSTALL_OPTIONAL_BREW=1`).
 
-## Shell loader
+## Shell configuration
 
-`./macforge setup` auto-adds and maintains the loader block in `~/.zshrc`.
-
-If you want to target a different file:
-
-```bash
-ZSHRC_PATH="$HOME/.zshrc.local" ./macforge setup --from shell_loader --until shell_loader
-```
+macforge stows `zsh/.zshrc` to `~/.zshrc`. The template sources `osx-conf/load`, which pulls in everything under `osx-conf/{aliases,common,functions,optional}`. Machine-local/private config belongs in `~/.config/macforge/secrets.zsh` (sourced at the end of the stowed `.zshrc` if present).
 
 ## Optional shell modules
 
@@ -63,6 +57,36 @@ chmod 600 "$HOME/.config/macforge/secrets.zsh"
 ```
 
 Then place private exports in that file (for example API keys).
+
+## Work / professional git identity
+
+`~/.gitconfig` (stowed from `git/.gitconfig`) includes `~/.gitconfig-professional` when the repo is under `~/Projects/`. That professional file is **not** tracked in macforge — keep it as a local file per machine to avoid leaking a work email into a public repo:
+
+```bash
+cat > "$HOME/.gitconfig-professional" <<'EOF'
+[user]
+    name = Your Name
+    email = you@work.example
+    signingkey = Your Name <you@work.example>
+EOF
+```
+
+`~/.gitconfig-personal` (for personal repos) stays tracked in macforge because its content is already intentionally public.
+
+## Syncing between computers
+
+macforge is the source of truth for your config. To keep other machines in sync:
+
+1. **On the machine where you changed config:** commit and push macforge (e.g. `git push`).
+2. **On each other machine:** pull and re-run setup so symlinks and state are updated:
+
+   ```bash
+   cd ~/Projects/macforge
+   git pull
+   ./macforge setup
+   ```
+
+After a `git pull`, running `./macforge setup` skips phases already completed (state is in `~/.local/state/macforge/setup.state`).
 
 ## Security hook
 
