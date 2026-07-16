@@ -1,134 +1,115 @@
 # macforge
 
-Personal macOS bootstrap + dotfiles + shell tooling in one place.
-
-Stow packages: `git`, `zsh`, `input`, `tmux`, `nvim`, `gh`. One `./macforge setup`
-symlinks all of them, installs Homebrew tools, and applies macOS defaults.
+Personal macOS bootstrap + dotfiles + shell tooling, managed with
+[chezmoi](https://www.chezmoi.io/). Dotfiles live under `home/` in chezmoi's
+source format and are applied with `chezmoi apply`. In **symlink mode**, managed
+files become symlinks back into this repo, so you can edit either side — while
+still getting templating, per-machine config, and setup scripts.
 
 ## Fresh Mac — one command
 
-On a brand-new Mac (installs Xcode CLT, clones this repo, runs setup):
+On a brand-new Mac (installs Xcode CLT, installs chezmoi, then clones + applies):
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/adrianolisboa/macforge/master/bootstrap.sh)
 ```
 
-Already cloned:
+Or directly with chezmoi:
 
 ```bash
-cd "$HOME/Projects/macforge"
-./macforge setup
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply adrianolisboa/macforge
 ```
 
-That command orchestrates all phases, saves progress, and can pause between phases.
+chezmoi asks "Is this a work machine?" (and, if yes, your work git name/email),
+lays down every dotfile, then runs the setup scripts (Homebrew, Brewfile, macOS
+defaults, iTerm2, git hooks).
 
 ## Working in this repo
 
 Agent + contributor rules (including "keep MIGRATION.md in sync") live in
 [AGENTS.md](AGENTS.md). New-Mac migration steps live in [MIGRATION.md](MIGRATION.md).
 
-## Setup behavior
+## Layout
 
-- Runs in phases (`xcode_clt`, `homebrew`, `stow`, `backup`, `migrate_legacy`, `apply_dotfiles`, `brew_bundle`, `macos_defaults`, `iterm2`).
-- Saves state at `~/.local/state/macforge/setup.state`.
-- If interrupted, re-run the same command to resume.
-- Prompts before moving to the next phase (use `--yes` for non-interactive mode).
-
-## Useful commands
-
-```bash
-./macforge help
-./macforge phases
-./macforge doctor
-./macforge hooks
-./macforge setup --yes
-./macforge setup --from brew_bundle
-./macforge setup --until apply_dotfiles
-./macforge setup --reset-state
-./macforge setup --with-optional-brew
+```
+.chezmoiroot                 → "home" (chezmoi's source root)
+home/
+  .chezmoi.toml.tmpl         prompts (work machine?) + symlink mode
+  .chezmoiignore             skip work identity on non-work machines
+  dot_zshrc, dot_gitconfig…  dotfiles (dot_ → ~/.)
+  dot_config/nvim, gh, atuin, macforge/osx-conf   → ~/.config/*
+  dot_gitconfig-professional.tmpl                 work identity (rendered from prompt)
+  run_once_* / run_onchange_*                     setup scripts
+scripts/install-git-hooks.sh                      gitleaks + docs-sync hooks
+docs/                                             plans/notes
 ```
 
-## Brewfile split
+## Everyday commands
 
-- `osx-conf/Brewfile`: core baseline tools.
-- `osx-conf/Brewfile.optional`: optional/legacy tools.
-- Optional tools are installed only with `--with-optional-brew` (or `MACFORGE_INSTALL_OPTIONAL_BREW=1`).
+```bash
+chezmoi apply                 # apply changes (symlinks + templates + scripts)
+chezmoi diff                  # preview what would change
+chezmoi edit ~/.zshrc         # edit a managed file's source (or just edit ~/.zshrc — it's a symlink)
+chezmoi cd                    # shell in the source repo
+chezmoi update                # git pull + apply
+chezmoi doctor                # health check
+chezmoi init                  # re-run prompts (e.g. to flip work machine)
+```
+
+## Brewfile
+
+- `home/dot_config/macforge/osx-conf/Brewfile` → applied to `~/.config/macforge/osx-conf/Brewfile`.
+- A `run_onchange` script re-runs `brew bundle` automatically whenever it changes.
+- Optional set: `brew bundle --file ~/.config/macforge/osx-conf/Brewfile.optional`.
 
 ## Shell configuration
 
-macforge stows `zsh/.zshrc` to `~/.zshrc`. The template sources `osx-conf/load`, which pulls in everything under `osx-conf/{aliases,common,functions,optional}`. Machine-local/private config belongs in `~/.config/macforge/secrets.zsh` (sourced at the end of the stowed `.zshrc` if present).
-
-## Optional shell modules
-
-Aliases for stack-specific tools (for example `terraform`) live in `osx-conf/optional` and only load when their command exists.
+`~/.zshrc` sources `~/.config/macforge/osx-conf/load`, which pulls in everything
+under `osx-conf/{aliases,common,functions,optional}`. Machine-local/private
+config belongs in `~/.config/macforge/secrets.zsh` (sourced at the end if present).
 
 ## Neovim
 
-The Neovim config is stowed from `nvim/.config/nvim` to `~/.config/nvim` (lazy.nvim, LSP, telescope, conform, claudecode.nvim). It used to live in a separate `dots.nvim` repo — it's now part of macforge, so there's nothing extra to clone. `lazy.nvim` bootstraps itself on first launch. See `nvim/.config/nvim/README.md`.
+Applied to `~/.config/nvim` (lazy.nvim, LSP, telescope, conform, claudecode.nvim);
+`lazy.nvim` bootstraps itself on first launch. See `home/dot_config/nvim/README.md`.
 
 ## gh (GitHub CLI)
 
-`gh/.config/gh/config.yml` is stowed to `~/.config/gh/config.yml` (aliases + git protocol only). The auth token lives in `~/.config/gh/hosts.yml`, which is **not** tracked — run `gh auth login` per machine. Stow `gh` before `gh auth login` so the tracked `config.yml` symlink wins.
+`config.yml` is managed; the auth token in `~/.config/gh/hosts.yml` is **not**
+tracked — run `gh auth login` per machine.
 
 ## Secrets
 
-Two supported approaches — both keep secrets out of git:
-
-**Recommended — 1Password references (no plaintext on disk).** Copy the reference
-template and fill in `op://` references, then run tools through the `oprun` helper
-so 1Password injects real values only at runtime:
+**Recommended — 1Password references (no plaintext on disk).** Fill in `op://`
+references and run tools through the `oprun` helper:
 
 ```bash
-cp osx-conf/secrets.env.example "$HOME/.config/macforge/secrets.env"
+cp ~/.config/macforge/osx-conf/secrets.env.example "$HOME/.config/macforge/secrets.env"
 # edit it: VAR=op://Vault/Item/field   (Copy Secret Reference from the 1Password app)
-oprun mix phx.server        # runs with secrets injected; nothing secret hits disk
+oprun mix phx.server        # secrets injected at runtime, nothing on disk
 ```
 
-**Legacy — machine-local file.** Still supported; sourced at the end of `.zshrc`:
-
-```bash
-mkdir -p "$HOME/.config/macforge"
-touch "$HOME/.config/macforge/secrets.zsh"
-chmod 600 "$HOME/.config/macforge/secrets.zsh"   # shell refuses to source it otherwise
-```
+**Legacy — machine-local file:** `~/.config/macforge/secrets.zsh` (chmod 600), sourced by `.zshrc`.
 
 ## Work / professional git identity
 
-`~/.gitconfig` (stowed from `git/.gitconfig`) includes `~/.gitconfig-professional` when the repo is under `~/Projects/`. That professional file is **not** tracked in macforge — keep it as a local file per machine to avoid leaking a work email into a public repo:
-
-```bash
-cat > "$HOME/.gitconfig-professional" <<'EOF'
-[user]
-    name = Your Name
-    email = you@work.example
-    signingkey = Your Name <you@work.example>
-EOF
-```
-
-`~/.gitconfig-personal` (for personal repos) stays tracked in macforge because its content is already intentionally public.
+On `chezmoi init`, answering "work machine? = yes" prompts for your work git
+name/email; `~/.gitconfig-professional` is then rendered from those answers
+(stored machine-locally in `~/.config/chezmoi/chezmoi.toml`, never in the repo).
+On non-work machines the file is skipped. `~/.gitconfig` includes it for repos
+under `~/Projects/`.
 
 ## Syncing between computers
 
-macforge is the source of truth for your config. To keep other machines in sync:
-
-1. **On the machine where you changed config:** commit and push macforge (e.g. `git push`).
-2. **On each other machine:** pull and re-run setup so symlinks and state are updated:
-
-   ```bash
-   cd ~/Projects/macforge
-   git pull
-   ./macforge setup
-   ```
-
-After a `git pull`, running `./macforge setup` skips phases already completed (state is in `~/.local/state/macforge/setup.state`).
+macforge is the source of truth. On the machine where you changed config,
+`git push` from the source (`chezmoi cd`). On another machine, `chezmoi update`
+(git pull + apply).
 
 ## Git hooks
 
 ```bash
-./macforge hooks
+./scripts/install-git-hooks.sh   # or the run_once script does it on first apply
 ```
 
-Installs two hooks:
-
-- **pre-push** — runs `gitleaks`; blocks the push if potential secrets are detected in the outgoing commit range.
-- **pre-commit** — non-blocking reminder to update `MIGRATION.md` / `README.md` when you commit changes to managed config.
+- **pre-push** — `gitleaks`; blocks the push if secrets are detected.
+- **pre-commit** — non-blocking reminder to update `MIGRATION.md` / `README.md` when managed config changes.

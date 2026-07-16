@@ -4,75 +4,83 @@ Rules for any agent (Claude Code, Cursor, Codex, …) or human working in this r
 
 ## What this is
 
-`macforge` is a personal macOS bootstrap + dotfiles repo. GNU Stow symlinks the
-tracked packages into `$HOME`; `./macforge setup` runs the whole bootstrap
-(Xcode CLT → Homebrew → stow → Brewfile → macOS defaults → iTerm2). It is the
-**single source of truth** for personal config across Macs.
+`macforge` is a personal macOS bootstrap + dotfiles repo managed with
+[chezmoi](https://www.chezmoi.io/). It's the **single source of truth** for
+personal config across Macs. `.chezmoiroot` points chezmoi at `home/`. In
+**symlink mode**, non-template files are symlinked back into the repo (edit
+either side); templates/scripts are rendered. `chezmoi apply` lays down dotfiles
+and runs the setup scripts (Homebrew → Brewfile → macOS defaults → iTerm2 → hooks).
 
 ## Layout
 
 ```
-macforge                 # setup CLI (setup | doctor | hooks | phases)
-bootstrap.sh             # one-command fresh-Mac entry (installs CLT, clones, runs setup)
-config/macforge.sh       # PACKAGES + MANAGED_FILES + Brewfile paths (edit when adding a package)
-scripts/                 # setup-macforge.sh, doctor-macforge.sh, install-git-hooks.sh
-zsh/ git/ tmux/ input/   # top-level dotfile packages ($HOME/.zshrc, .gitconfig, …)
-nvim/ gh/                # ~/.config packages (.config/nvim, .config/gh)
-osx-conf/                # shell loader: aliases/, functions/, common/, optional/, Brewfile(.optional), iterm2/
-MIGRATION.md             # new-Mac guide (keep in sync — see rules)
-README.md                # human overview
+.chezmoiroot                       # "home"
+home/
+  .chezmoi.toml.tmpl               # prompts (work machine? → data), sets mode = "symlink"
+  .chezmoiignore                   # skip .gitconfig-professional on non-work machines
+  dot_zshrc dot_gitconfig …        # dotfiles: dot_ → ~/.  (symlinked in symlink mode)
+  dot_config/{nvim,gh,atuin}       # → ~/.config/*
+  dot_config/macforge/osx-conf/    # shell loader (aliases/ common/ functions/ optional/) + Brewfile(.optional) + iterm2/
+  dot_gitconfig-professional.tmpl  # work identity, rendered from prompt data (never a secret in the repo)
+  run_once_* / run_onchange_*      # setup scripts (homebrew, brewfile, macos defaults, iterm2, git-hooks)
+scripts/install-git-hooks.sh       # gitleaks pre-push + docs-sync pre-commit
+bootstrap.sh                       # fresh-Mac one-liner (CLT + chezmoi + init --apply)
+README.md / MIGRATION.md / docs/   # human docs (kept in sync — see rules)
 ```
 
-## Running setup
+## Running / applying
 
 ```bash
-./macforge setup                 # interactive, phase by phase
-./macforge setup --yes           # non-interactive (use this when driving as an agent)
-./macforge setup --from <phase>  # resume; phases: xcode_clt homebrew stow backup
-./macforge setup --with-optional-brew
-./macforge doctor                # health check — MUST be 0 failures before you commit
-./macforge hooks                 # install git hooks (pre-push gitleaks + pre-commit reminder)
+chezmoi apply                        # apply everything
+chezmoi apply --exclude=scripts      # files/symlinks only (skip brew/defaults scripts)
+chezmoi diff                         # preview
+chezmoi doctor                       # health check
+chezmoi init --promptDefaults        # non-interactive (agent driving): work=false
+chezmoi init                         # interactive: prompts work machine? + work email
 ```
+
+On this machine, chezmoi's source is `~/.local/share/chezmoi` → symlinked to
+this repo, so `chezmoi` commands work with no `--source` flag and edits/pushes
+happen here.
 
 ## Golden rules
 
 1. **Keep `MIGRATION.md` and `README.md` in sync.** If you change managed
-   dotfiles, packages, Brewfiles, or setup behavior in a way that affects how a
-   new Mac is set up, update `MIGRATION.md` (and `README.md` if the overview
-   changed) in the same change. A pre-commit hook reminds you.
-2. **Adding or removing a stow package** → update `PACKAGES` in
-   `config/macforge.sh`. For top-level `$HOME` dotfiles, also update
-   `MANAGED_FILES` (and `managed_source_path` in the setup + doctor scripts).
-3. **No secrets, no work identity — this repo is PUBLIC.** Never commit tokens,
+   dotfiles, run scripts, the Brewfile, or setup behavior in a way that affects
+   how a new Mac is set up, update `MIGRATION.md` (and `README.md`) in the same
+   change. A pre-commit hook reminds you.
+2. **No secrets, no work identity — this repo is PUBLIC.** Never commit tokens,
    API keys, a work email (e.g. `*@remote.com`), or work-only tooling
-   (`glab`, `remotectl`, work MCP certs). These stay machine-local and untracked:
-   `~/.gitconfig-professional`, `~/.config/macforge/secrets.zsh`,
-   `~/.config/gh/hosts.yml`, SSH keys.
-4. **Run `./macforge doctor` before committing** — it must report 0 failures.
-5. **Commits:** Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:` …),
-   concise, lowercase description, **no `Co-Authored-By`** and no `--author`.
-6. **Prune to what's actually used.** When trimming aliases/tools, check real
-   usage (`~/.zsh_history`) rather than guessing; presence = keep, absence in a
-   small history ≠ proof of disuse.
+   (`glab`, `remotectl`, work MCP certs). Machine-local & untracked:
+   `~/.config/chezmoi/chezmoi.toml` (holds prompt answers incl. work email),
+   `~/.config/macforge/secrets.zsh|env`, `~/.config/gh/hosts.yml`, SSH keys.
+   Work-specific values belong in prompt data / 1Password templates, not literals.
+3. **Symlink-mode gotcha:** anything sourced by iterating a directory must follow
+   symlinks (`find -L`, not `find -type f`) — module files under
+   `~/.config/macforge/osx-conf` are symlinks.
+4. **Verify before committing:** `chezmoi diff` clean/expected, shell loads,
+   nvim loads (below). No `chezmoi doctor` failures.
+5. **Commits:** Conventional Commits (`feat:`/`fix:`/`chore:`/`docs:` …),
+   concise, lowercase, **no `Co-Authored-By`**, no `--author`.
+6. **Prune to what's actually used** — check real usage (`~/.zsh_history`),
+   don't guess; presence = keep, absence in a small history ≠ proof of disuse.
 
-## Adding a new dotfile or package (the pattern)
+## Adding a new dotfile (the pattern)
 
-Stow mirrors a package's internal tree onto `$HOME`. Match the target path:
+chezmoi maps source names to targets by prefix:
 
-- **Top-level dotfile** (`~/.foorc`): put it at `zsh/.foorc`-style, i.e. a new
-  package dir `foo/.foorc`, add `foo` to `PACKAGES` and `.foorc` to
-  `MANAGED_FILES`.
-- **Under `~/.config`** (`~/.config/tool/…`): create `tool/.config/tool/…` and
-  add `tool` to `PACKAGES`. If the tool writes secrets into its config dir
-  (like `gh` → `hosts.yml`), pre-create the real dir in `apply_stow` so stow
-  folds only the tracked file, and gitignore the secret file.
+- `~/.foorc` → `home/dot_foorc`
+- `~/.config/tool/conf` → `home/dot_config/tool/conf`
+- needs a template (per-machine/secret) → add `.tmpl`, use `.chezmoi.*` vars / `onepasswordRead`
+- executable that ISN'T symlinked (a template) → prefix `executable_`
+- secret the tool writes into its own dir (like `gh` `hosts.yml`) → gitignore it
 
-Then: `./macforge setup --from apply_dotfiles`, verify with `./macforge doctor`,
-and update `MIGRATION.md` + `README.md`.
+Then `chezmoi apply`, verify, and update `MIGRATION.md` + `README.md`.
 
 ## Verify like an agent
 
-- `./macforge doctor` → 0 failures.
-- Shell config loads: `zsh -ic 'source osx-conf/load && echo ok'`.
+- `chezmoi diff` shows only intended changes; `chezmoi apply` is clean.
+- Test on a scratch home before real machines:
+  `HOME=/tmp/x chezmoi init --source="$PWD" --promptDefaults && HOME=/tmp/x chezmoi apply --source="$PWD" --exclude=scripts`
+- Shell loads: `zsh -ic 'echo ok; alias gco'` (aliases present).
 - Neovim loads: `nvim --headless -c 'lua print("ok")' -c 'quit'`.
-- Stow structure (dry run into a temp HOME): `stow -n -v --target=/tmp/fakehome <pkg>`.

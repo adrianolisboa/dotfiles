@@ -1,207 +1,147 @@
 # New Mac Migration Guide
 
-This guide bootstraps a new Mac to match the current one. Everything portable
-lives in this repo (`macforge`); anything with a secret or a work identity is
-**not** in the repo and must be restored separately (see
-[Restore machine-local files](#3-restore-machine-local-files-not-in-the-repo)).
-
-macforge now includes the Neovim config too (it used to be a separate
-`dots.nvim` repo), so there is nothing else to clone.
+Bootstraps a new Mac to match this one, using [chezmoi](https://www.chezmoi.io/).
+Everything portable lives in this repo; anything with a secret or work identity
+is **not** in the repo and is restored separately (see
+[machine-local files](#3-restore-machine-local-files-not-in-the-repo)).
 
 ---
 
 ## TL;DR
 
-One command on a brand-new Mac (installs Xcode CLT, clones macforge, runs setup):
+One command on a brand-new Mac (installs Xcode CLT + chezmoi, then applies):
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/adrianolisboa/macforge/master/bootstrap.sh)
 ```
 
-Or manually:
+Or directly:
 
 ```bash
-mkdir -p "$HOME/Projects" && cd "$HOME/Projects"
-git clone git@github.com:adrianolisboa/macforge.git   # or https:// if no key yet
-cd macforge
-./macforge setup
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply adrianolisboa/macforge
 ```
 
-Then restore the machine-local files (SSH keys, secrets, work git identity),
-run `gh auth login`, and open `nvim` once to let plugins install. Details below.
+chezmoi prompts "Is this a work machine?" (and, if yes, your work git name/email),
+symlinks every dotfile into place, and runs the setup scripts. Then restore SSH
+keys/secrets (below), `gh auth login`, and open `nvim` once for plugins.
 
 ---
 
 ## Driving this with Claude
 
-Open Claude Code in `~/Projects/macforge` on the new Mac and paste:
+Open Claude Code on the new Mac and paste:
 
-> Read `MIGRATION.md` and set up this Mac. Run `./macforge setup` phase by
-> phase, pausing so I can confirm. Do **not** invent or restore any secrets,
-> SSH keys, or my work git identity — stop and tell me when a step needs one,
-> and I'll provide it. After setup, run `./macforge doctor` and report what's
-> still missing.
-
-Claude can run the phases and verification, but it must **not** fabricate
-secrets. The [machine-local files](#3-restore-machine-local-files-not-in-the-repo)
-are things only you can provide.
+> Read `MIGRATION.md` and set up this Mac with chezmoi. Do **not** invent or
+> restore any secrets, SSH keys, or my work git identity — stop and tell me when
+> a step needs one, and I'll provide it. After `chezmoi apply`, run
+> `chezmoi doctor` and report what's still missing.
 
 ---
 
 ## 1. Prerequisites
 
 - **macOS** (Apple Silicon assumed; paths use `/opt/homebrew`).
-- **Xcode Command Line Tools** — the setup installs these in its first phase.
-- **Homebrew** — the setup installs it if missing.
-  - ⚠️ **Work Mac note:** if this is a Remote-managed Mac, it likely ships with
-    **workbrew** at `/opt/workbrew/bin/brew`, which manages the company's
-    mandatory formulae. That's separate from macforge. macforge's Brewfile only
-    installs a small personal CLI baseline. If you hit a "conflicting Homebrew
-    wrapper" error, run brew through whichever install your shell env points at
-    and let workbrew own its own set.
-- An SSH key registered with GitHub, **or** clone over HTTPS for the first pull.
+- **Xcode CLT** + **chezmoi** — the bootstrap one-liner installs both.
+- ⚠️ **Work Mac:** a Remote-managed Mac ships with **workbrew** at
+  `/opt/workbrew/bin/brew`, which manages mandatory formulae. macforge's Brewfile
+  is a small personal baseline and the run script uses whichever `brew` is on
+  PATH — no conflict. Work-only tools (`glab`, `awscli`, `gimme-aws-creds`, …)
+  are intentionally NOT in macforge; workbrew provides them.
 
 ---
 
-## 2. Run macforge setup
+## 2. Apply with chezmoi
+
+The bootstrap one-liner runs this for you; to do it manually:
 
 ```bash
-cd ~/Projects/macforge
-./macforge setup           # interactive; prompts between phases
-# ./macforge setup --yes   # non-interactive
+chezmoi init --apply adrianolisboa/macforge
 ```
 
-Phases, in order:
+What happens:
 
-| Phase | What it does |
-|-------|--------------|
-| `xcode_clt` | Installs Xcode Command Line Tools |
-| `homebrew` | Installs Homebrew if missing |
-| `stow` | Installs GNU Stow |
-| `backup` | Backs up any conflicting real files to `~/.dotfiles-backup/<ts>/` |
-| `migrate_legacy` | Fixes up any stale symlinks |
-| `apply_dotfiles` | Stows `git zsh input tmux nvim gh` → symlinks into `$HOME` and `~/.config` |
-| `brew_bundle` | Installs `osx-conf/Brewfile` (add `--with-optional-brew` for the optional set) |
-| `macos_defaults` | Dark mode, key repeat, Finder tweaks, Dock autohide |
-| `iterm2` | Points iTerm2 at the tracked prefs folder |
+- **Prompts** "Is this a work machine?" → if yes, your work git name/email
+  (stored in `~/.config/chezmoi/chezmoi.toml`, machine-local, never in the repo).
+- **Symlinks** every dotfile into `$HOME` / `~/.config` (symlink mode — edit
+  either side).
+- **Runs the setup scripts** in order:
 
-State is saved to `~/.local/state/macforge/setup.state`; re-running resumes
-where it left off. Useful flags:
+| Script | What it does |
+|--------|--------------|
+| `run_once_before_10-homebrew` | Install Homebrew if no brew present (skips if workbrew/homebrew exists) |
+| `run_onchange_after_20-brewfile` | `brew bundle` from `~/.config/macforge/osx-conf/Brewfile` (re-runs when it changes) |
+| `run_onchange_after_30-macos-defaults` | Dark mode, key repeat, Finder, Dock autohide |
+| `run_once_after_40-iterm2` | Point iTerm2 at the tracked prefs folder |
+| `run_once_after_50-git-hooks` | Install gitleaks pre-push + docs-sync pre-commit |
+
+Useful:
 
 ```bash
-./macforge setup --with-optional-brew    # openconnect, pass, thefuck, prettyping, the_silver_searcher
-./macforge setup --from brew_bundle       # resume from a phase
-./macforge doctor                         # health check
+chezmoi diff                     # preview before applying
+chezmoi apply --exclude=scripts  # dotfiles only (skip brew/defaults)
+chezmoi doctor                   # health check
+chezmoi update                   # git pull + apply (sync from another machine)
+brew bundle --file ~/.config/macforge/osx-conf/Brewfile.optional   # optional tools
 ```
 
-After stow, your dotfiles are symlinks back into this repo. Edit files **here**,
-not in `~` — e.g. `~/.config/nvim` is a symlink to `nvim/.config/nvim`.
+Edit a managed file directly (it's a symlink into the repo) or via
+`chezmoi edit ~/.zshrc`; push from the source with `chezmoi cd` + `git push`.
 
 ---
 
 ## 3. Restore machine-local files (NOT in the repo)
 
-These hold secrets or a work identity, so they are deliberately kept out of git.
-Transfer them securely (1Password, encrypted transfer, or regenerate) — never
-commit them.
+Kept out of git deliberately. Transfer securely (1Password / regenerate); never commit.
 
-| What | Path | How to restore |
-|------|------|----------------|
-| **SSH keys + git signing** | 1Password (recommended) or `~/.ssh/*` | Best: enable the **1Password SSH agent** (1Password → Settings → Developer → "Use the SSH Agent") — keys stay in 1Password, nothing to copy, and it signs commits too. Fallback: copy `~/.ssh/adriano_github`, `github_personal`, `id_ed25519`, `id_ed25519_gitlab` (+ `.pub`) and `chmod 600` the private keys. |
-| **Secrets / tokens** | `~/.config/macforge/secrets.env` (refs) or `secrets.zsh` (legacy) | Recommended: `cp osx-conf/secrets.env.example ~/.config/macforge/secrets.env`, fill in `op://` references, run tools via `oprun`. Legacy: restore `secrets.zsh` (chmod 600), sourced by `.zshrc`. |
-| **Work git identity** | `~/.gitconfig-professional` | Recreate by hand (holds your work name/email). Auto-included for repos under `~/Projects/`. Template below. |
+| What | How to restore |
+|------|----------------|
+| **SSH keys + git signing** | Best: enable the **1Password SSH agent** (1Password → Settings → Developer → "Use the SSH Agent") — keys stay in 1Password, nothing to copy, signs commits too. Fallback: copy `~/.ssh/adriano_github`, `github_personal`, `id_ed25519`, `id_ed25519_gitlab` (+ `.pub`), `chmod 600` the private keys. |
+| **Secrets / tokens** | Recommended: `cp ~/.config/macforge/osx-conf/secrets.env.example ~/.config/macforge/secrets.env`, fill in `op://` references, run tools via `oprun`. Legacy: restore `~/.config/macforge/secrets.zsh` (chmod 600). |
+| **Work git identity** | Answer "work machine? = yes" at `chezmoi init` and it renders `~/.gitconfig-professional` from your prompt answers. (Or restore the file by hand.) |
 
 If you use plain SSH key files (not the 1Password agent), the shell auto-runs
-`ssh-add ~/.ssh/adriano_github` on first interactive login; make sure that key
-exists (or update the name in `osx-conf/common/exports`).
-
-**`~/.gitconfig-professional` template** (fill in your real work values):
-
-```ini
-[user]
-    name = Your Name
-    email = you@work.example
-    signingkey = Your Name <you@work.example>
-```
+`ssh-add ~/.ssh/adriano_github` on first login — make sure that key exists (or
+update the name in `osx-conf/common/exports`).
 
 ---
 
 ## 4. GitHub / GitLab CLI auth
 
-The tracked `gh` config carries only aliases + protocol; the token is not in the
-repo. Authenticate per machine:
-
 ```bash
-gh auth login          # writes ~/.config/gh/hosts.yml (a real local file, stays out of the repo)
+gh auth login    # writes ~/.config/gh/hosts.yml (real local file, not in the repo)
 ```
 
-`glab` (GitLab CLI) is a work tool and is intentionally **not** tracked here.
-Install and authenticate it separately if you need it for work.
+`glab` is a work tool, intentionally not tracked — install/auth separately if needed.
 
 ---
 
-## 5. Neovim first launch
+## 5. Neovim + shell history
 
 ```bash
-nvim        # lazy.nvim bootstraps itself, then installs plugins
-# if needed: :Lazy sync
+nvim                                        # lazy.nvim bootstraps + installs plugins
+brew install --cask font-fira-code-nerd-font # Nerd Font for icons
+atuin import auto                            # import existing shell history (atuin starts empty)
 ```
 
-Install a Nerd Font for icons:
-
-```bash
-brew install --cask font-fira-code-nerd-font
-```
-
-Then set the terminal font to "FiraCode Nerd Font" (or "… Mono").
-
-## 5b. Shell history (atuin)
-
-atuin starts with an empty database — import your existing shell history once so
-Ctrl-R finds old commands:
-
-```bash
-atuin import auto
-```
-
-Config is stowed from macforge (searches all history by default; local-only, no
-sync). Ctrl-R searches everything; `↑` still uses normal zsh history.
+Set the terminal font to "FiraCode Nerd Font". atuin config (searches all
+history, local-only) is managed by macforge.
 
 ---
 
-## 6. Apps to reinstall manually (optional checklist)
+## 6. Apps to reinstall manually (optional)
 
-macforge installs CLI tools only. These GUI apps / casks were on the old Mac —
-reinstall whatever you still want (many arrive via work MDM/workbrew on a work
-Mac):
-
-- 1Password CLI (`1password-cli`)
-- ChatGPT (`chatgpt`), Chatty (`chatty`)
-- Fonts: `font-inter`, `font-fira-code-nerd-font`
-- MacDown (`macdown`)
-- ngrok (`ngrok`)
-- noTunes (`notunes`)
-- AWS session-manager-plugin (`session-manager-plugin`)
-- wkhtmltopdf (`wkhtmltopdf`)
+The Brewfile installs the personal CLI baseline + these casks (1password-cli,
+font-inter, macdown, ngrok, notunes, wkhtmltopdf). Anything else you want
+(ChatGPT, work apps via MDM/workbrew, etc.) reinstall as needed.
 
 ---
 
 ## 7. Verify
 
 ```bash
-./macforge doctor
+chezmoi doctor
+ls -la ~/.zshrc ~/.config/nvim/init.lua ~/.config/gh/config.yml   # symlinks into ~/.local/share/chezmoi
+git -C ~/Projects config --get user.email                          # work email if work machine
+zsh -ic 'alias gco'                                                # aliases loaded
+nvim --headless -c 'lua print("ok")' -c 'quit'                     # nvim loads
 ```
-
-Quick manual checks:
-
-```bash
-ls -la ~/.zshrc ~/.gitconfig ~/.config/nvim ~/.config/gh    # should be symlinks into ~/Projects/macforge
-git config --includes --get user.email                       # in a ~/Projects repo, should show your work email (from the local professional file)
-ssh-add -l                                                   # your github key should be loaded
-nvim --headless -c 'lua print("ok")' -c 'quit'               # nvim loads clean
-```
-
-If `~/.config/gh` ended up as a full symlink into the repo (rather than a real
-dir with `config.yml` symlinked inside it), remove it and re-run
-`./macforge setup --from apply_dotfiles` — the setup pre-creates `~/.config/gh`
-so `gh auth login` never writes your token into the repo.

@@ -72,7 +72,7 @@ set -euo pipefail
 staged="$(git diff --cached --name-only)"
 
 # Paths whose changes may affect how a new Mac is set up.
-config_re='^(zsh/|git/|tmux/|input/|nvim/|gh/|osx-conf/|scripts/|config/macforge\.sh|bootstrap\.sh)'
+config_re='^(home/|scripts/|bootstrap\.sh|\.chezmoiroot)'
 docs_re='^(MIGRATION\.md|README\.md)$'
 
 if grep -qE "$config_re" <<<"$staged" && ! grep -qE "$docs_re" <<<"$staged"; then
