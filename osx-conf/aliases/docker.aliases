@@ -1,5 +1,28 @@
 # vim: ft=sh sw=2 ts=2 expandtab
 
+# Ensure colima is running before docker subcommands that need the daemon.
+# Cheap subcommands (version/help/completion) skip the check.
+docker() {
+  case "$1" in
+    ""|-v|--version|version|help|--help|completion|context)
+      command docker "$@"
+      return
+      ;;
+  esac
+
+  if command -v colima >/dev/null 2>&1; then
+    if ! colima status >/dev/null 2>&1; then
+      echo "colima is not running — starting it..." >&2
+      colima start || {
+        echo "colima start failed; aborting docker $1" >&2
+        return 1
+      }
+    fi
+  fi
+
+  command docker "$@"
+}
+
 alias db="docker build ."
 alias di="docker images"
 alias dp="docker push"

@@ -4,8 +4,6 @@
 alias desktop='cd $HOME/Desktop'
 alias opendesktop='open $HOME/Desktop'
 alias finder='opendesktop'
-alias dropbox='open $HOME/Dropbox'
-alias books='open $HOME/Dropbox/Books'
 
 # Local repositories should be defined here
 alias nvimdir='cd ${HOME}/.config/nvim' # https://github.com/adrianolisboa/dots.nvim

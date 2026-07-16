@@ -32,3 +32,8 @@ command -v colima >/dev/null 2>&1 && eval "$(colima completion zsh)"
 
 # Machine-local overrides (work env, secrets, per-machine paths)
 [[ -f "$HOME/.config/macforge/secrets.zsh" ]] && source "$HOME/.config/macforge/secrets.zsh"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+[ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"

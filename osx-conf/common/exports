@@ -21,7 +21,7 @@ if [[ -o interactive ]]; then
   # Start ssh-agent automatically if needed.
   if [[ -z "$SSH_AUTH_SOCK" ]]; then
     eval "$(ssh-agent -s)" >/dev/null
-    ssh-add ~/.ssh/id_github 2>/dev/null || true
+    ssh-add ~/.ssh/adriano_github 2>/dev/null || true
   fi
 fi
 
