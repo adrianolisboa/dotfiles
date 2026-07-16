@@ -286,6 +286,12 @@ migrate_legacy_links() {
 apply_stow() {
   log "[apply_dotfiles] Applying dotfiles with stow..."
   cd "$REPO_ROOT"
+
+  # Pre-create ~/.config/gh as a real directory so stow folds only config.yml
+  # into it. Otherwise stow symlinks the whole gh dir into the repo, and a later
+  # `gh auth login` would write its token (hosts.yml) into the repo working tree.
+  mkdir -p "$TARGET_DIR/.config/gh"
+
   stow --restow --target "$TARGET_DIR" "${PACKAGES[@]}"
   log "[apply_dotfiles] Done."
 }

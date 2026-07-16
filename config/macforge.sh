@@ -3,7 +3,7 @@
 # Central setup configuration for macforge bootstrap.
 MACFORGE_NAME="macforge"
 
-PACKAGES=(git zsh input tmux)
+PACKAGES=(git zsh input tmux nvim gh)
 MANAGED_FILES=(
   ".gitconfig"
   ".gitconfig-personal"

@@ -2,6 +2,9 @@
 
 Personal macOS bootstrap + dotfiles + shell tooling in one place.
 
+Stow packages: `git`, `zsh`, `input`, `tmux`, `nvim`, `gh`. One `./macforge setup`
+symlinks all of them, installs Homebrew tools, and applies macOS defaults.
+
 ## One command setup
 
 ```bash
@@ -44,7 +47,15 @@ macforge stows `zsh/.zshrc` to `~/.zshrc`. The template sources `osx-conf/load`,
 
 ## Optional shell modules
 
-Aliases for stack-specific tools (for example `terraform`, `flutter`, `exercism`, `minikube`, `gigalixir`) live in `osx-conf/optional` and only load when their command exists.
+Aliases for stack-specific tools (for example `terraform`) live in `osx-conf/optional` and only load when their command exists.
+
+## Neovim
+
+The Neovim config is stowed from `nvim/.config/nvim` to `~/.config/nvim` (lazy.nvim, LSP, telescope, conform, claudecode.nvim). It used to live in a separate `dots.nvim` repo — it's now part of macforge, so there's nothing extra to clone. `lazy.nvim` bootstraps itself on first launch. See `nvim/.config/nvim/README.md`.
+
+## gh (GitHub CLI)
+
+`gh/.config/gh/config.yml` is stowed to `~/.config/gh/config.yml` (aliases + git protocol only). The auth token lives in `~/.config/gh/hosts.yml`, which is **not** tracked — run `gh auth login` per machine. Stow `gh` before `gh auth login` so the tracked `config.yml` symlink wins.
 
 ## Secrets
 

@@ -2,3 +2,7 @@
 # file at ~/.gitconfig-professional instead.
 git/.gitconfig-professional
 .gitconfig-professional
+
+# gh CLI: track only config.yml. hosts.yml holds the auth token and must never
+# be committed (safety net in case stow ever folds the whole gh dir).
+gh/.config/gh/hosts.yml
