@@ -155,6 +155,18 @@ brew install --cask font-fira-code-nerd-font
 
 Then set the terminal font to "FiraCode Nerd Font" (or "… Mono").
 
+## 5b. Shell history (atuin)
+
+atuin starts with an empty database — import your existing shell history once so
+Ctrl-R finds old commands:
+
+```bash
+atuin import auto
+```
+
+Config is stowed from macforge (searches all history by default; local-only, no
+sync). Ctrl-R searches everything; `↑` still uses normal zsh history.
+
 ---
 
 ## 6. Apps to reinstall manually (optional checklist)
