@@ -73,6 +73,7 @@ What happens:
 | `run_onchange_after_30-macos-defaults` | Dark mode, key repeat, Finder, Dock autohide |
 | `run_once_after_40-iterm2` | Point iTerm2 at the tracked prefs folder |
 | `run_once_after_50-git-hooks` | Install gitleaks pre-push + docs-sync pre-commit |
+| `run_once_after_60-claude-code` | Install Claude Code via the native installer (if missing) |
 
 Useful:
 
@@ -125,6 +126,21 @@ atuin import auto                            # import existing shell history (at
 
 Set the terminal font to "FiraCode Nerd Font". atuin config (searches all
 history, local-only) is managed by macforge.
+
+## 5b. Claude Code config (private repo)
+
+Claude Code itself installs via the `run_once_after_60-claude-code` script above.
+Its **config** (settings, CLAUDE.md, skills, commands, hooks) lives in a separate
+**private** repo — kept out of this public repo because it's work-flavored:
+
+```bash
+git clone git@github.com:adrianolisboa/claude-config.git ~/Projects/claude-config
+~/Projects/claude-config/install.sh   # symlinks the config into ~/.claude (backs up existing)
+```
+
+Secrets are NOT in that repo — restore them per machine:
+- Anthropic API key → 1Password / macOS Keychain (not a file in git)
+- MCP server tokens (`~/.claude.json`) → re-authenticate: run `claude`, then `/mcp`
 
 ---
 
