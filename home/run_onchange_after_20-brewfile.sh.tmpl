@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
 # Re-runs automatically whenever the Brewfile changes (hash below).
 # Brewfile hash: {{ include "dot_config/macforge/Brewfile" | sha256sum }}
@@ -11,5 +11,28 @@ BREW="$(command -v brew 2>/dev/null || true)"
 [ -f "$BREWFILE" ] || { echo "[brew_bundle] $BREWFILE missing — skipping"; exit 0; }
 
 echo "[brew_bundle] installing from $BREWFILE"
-"$BREW" bundle --file="$BREWFILE"
+
+# Fast path: install the whole Brewfile at once. If any entry is retired
+# upstream, brew aborts the batch before installing anything — so on failure
+# we fall back to installing entry by entry, isolating the dead reference so
+# it can't block everything else. A missing entry warns; it never fails setup.
+if "$BREW" bundle --file="$BREWFILE"; then
+  echo "[brew_bundle] done"
+else
+  echo "[brew_bundle] batch install failed — retrying entry by entry"
+  header="$(grep -E '^cask_args' "$BREWFILE" || true)"
+  failures=()
+  while IFS= read -r line; do
+    if ! printf '%s\n%s\n' "$header" "$line" | "$BREW" bundle --file=- >/dev/null 2>&1; then
+      echo "  ⚠️  could not install: $line"
+      failures+=("$line")
+    fi
+  done < <(grep -E '^[[:space:]]*(brew|cask) "' "$BREWFILE")
+  if [ "${#failures[@]}" -gt 0 ]; then
+    echo "[brew_bundle] ${#failures[@]} entr(ies) failed (likely retired upstream) — prune them from the Brewfile:"
+    printf '      %s\n' "${failures[@]}"
+  fi
+fi
+
 echo "[brew_bundle] optional set available via: $BREW bundle --file=$HOME/.config/macforge/Brewfile.optional"
+exit 0
