@@ -50,8 +50,8 @@ happen here.
    how a new Mac is set up, update `MIGRATION.md` (and `README.md`) in the same
    change. A pre-commit hook reminds you.
 2. **No secrets, no work identity — this repo is PUBLIC.** Never commit tokens,
-   API keys, a work email (e.g. `*@remote.com`), or work-only tooling
-   (`glab`, `remotectl`, work MCP certs). Machine-local & untracked:
+   API keys, a work email or employer domain, or work-only tooling
+   (internal CLIs, cloud-creds helpers, work MCP certs). Machine-local & untracked:
    `~/.config/chezmoi/chezmoi.toml` (holds prompt answers incl. work email),
    `~/.config/macforge/secrets.zsh|env`, `~/.config/gh/hosts.yml`, SSH keys.
    Work-specific values belong in prompt data / 1Password templates, not literals.

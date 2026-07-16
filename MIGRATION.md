@@ -42,10 +42,10 @@ Open Claude Code on the new Mac and paste:
 
 - **macOS** (Apple Silicon assumed; paths use `/opt/homebrew`).
 - **Xcode CLT** + **chezmoi** — the bootstrap one-liner installs both.
-- ⚠️ **Work Mac:** a Remote-managed Mac ships with **workbrew** at
+- ⚠️ **Work Mac:** a company-managed Mac may ship with **workbrew** at
   `/opt/workbrew/bin/brew`, which manages mandatory formulae. macforge's Brewfile
   is a small personal baseline and the run script uses whichever `brew` is on
-  PATH — no conflict. Work-only tools (`glab`, `awscli`, `gimme-aws-creds`, …)
+  PATH — no conflict. Work-only tools (your employer's CLIs, cloud-creds helpers, …)
   are intentionally NOT in macforge; workbrew provides them.
 
 ---
