@@ -1,0 +1,15 @@
+{{- /* Prompt once per machine; answers are stored in ~/.config/chezmoi/chezmoi.toml */ -}}
+{{- $work := promptBoolOnce . "work" "Is this a work machine" false -}}
+{{- $workName := "" -}}
+{{- $workEmail := "" -}}
+{{- if $work -}}
+{{-   $workName = promptStringOnce . "workName" "Work git name (for ~/.gitconfig-professional)" "" -}}
+{{-   $workEmail = promptStringOnce . "workEmail" "Work git email" "" -}}
+{{- end -}}
+{{- /* symlink mode: non-template files are symlinked into the repo (stow-like edit-either-side) */ -}}
+mode = "symlink"
+
+[data]
+    work = {{ $work }}
+    workName = {{ $workName | quote }}
+    workEmail = {{ $workEmail | quote }}

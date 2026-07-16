@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Install the repo's git hooks (gitleaks pre-push + docs-sync pre-commit) into
+# the chezmoi source repo.
+SRC="{{ .chezmoi.sourceDir }}"
+REPO="$(cd "$SRC/.." && pwd)"
+if [ -x "$REPO/scripts/install-git-hooks.sh" ]; then
+  ( cd "$REPO" && ./scripts/install-git-hooks.sh ) || echo "[git-hooks] install failed (non-fatal)"
+else
+  echo "[git-hooks] scripts/install-git-hooks.sh not found — skipping"
+fi

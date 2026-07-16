@@ -6,8 +6,8 @@ alias opendesktop='open $HOME/Desktop'
 alias finder='opendesktop'
 
 # Local repositories should be defined here
-alias nvimdir='cd ${HOME}/.config/nvim' # https://github.com/adrianolisboa/dots.nvim
-alias dotfiles='cd ${HOME}/Projects/macforge'
+alias nvimdir='cd ${HOME}/.config/nvim'
+alias dotfiles='cd "$(dirname "$(chezmoi source-path 2>/dev/null)")" 2>/dev/null || cd ${HOME}/Projects/macforge' # chezmoi source repo
 alias shelldir='cd ${LOAD_ROOT}' # These shell files
 
 alias fshell='vim ${HOME}/.zshrc'

@@ -1,7 +1,7 @@
 # vim: ft=zsh sw=2 ts=2 expandtab
 
 # macforge loader: aliases, common, functions, optional modules
-LOAD_ROOT="$HOME/Projects/macforge/osx-conf"
+LOAD_ROOT="$HOME/.config/macforge/osx-conf"
 . "${LOAD_ROOT}/load"
 
 # fzf

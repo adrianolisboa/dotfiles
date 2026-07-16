@@ -7,7 +7,7 @@ push_to_path() {
 }
 
 # macforge helper scripts and user bins first.
-MACFORGE_LOAD_ROOT="${LOAD_ROOT:-$HOME/Projects/macforge/osx-conf}"
+MACFORGE_LOAD_ROOT="${LOAD_ROOT:-$HOME/.config/macforge/osx-conf}"
 push_to_path "$MACFORGE_LOAD_ROOT/bin"
 push_to_path "$HOME/.local/bin"
 push_to_path "$HOME/go/bin"

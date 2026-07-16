@@ -1,0 +1,6 @@
+{{- /* Only lay down the work git identity on work machines. */ -}}
+{{ if not .work }}
+.gitconfig-professional
+{{ end }}
+{{- /* osx-conf's own repo docs/ignore don't belong in ~/.config */ -}}
+.config/macforge/osx-conf/README.md

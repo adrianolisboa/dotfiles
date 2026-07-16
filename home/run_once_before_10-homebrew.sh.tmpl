@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Install Homebrew only if no brew (workbrew or homebrew) is present.
+if command -v brew >/dev/null 2>&1 || [ -x /opt/workbrew/bin/brew ] || [ -x /opt/homebrew/bin/brew ]; then
+  echo "[homebrew] already present — skipping"
+  exit 0
+fi
+
+echo "[homebrew] installing..."
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+  grep -q 'brew shellenv' "$HOME/.zprofile" 2>/dev/null || \
+    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
+fi

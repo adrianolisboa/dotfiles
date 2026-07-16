@@ -1,29 +1,26 @@
 #!/usr/bin/env bash
 
-# macforge fresh-Mac bootstrap.
-# Installs Xcode Command Line Tools (for git), clones macforge, and runs setup.
+# macforge fresh-Mac bootstrap (chezmoi).
+# Installs Xcode Command Line Tools (for git), installs chezmoi, then
+# `chezmoi init --apply` clones the repo, lays down dotfiles (as symlinks),
+# and runs the setup scripts (Homebrew, Brewfile, macOS defaults, iTerm2).
 #
 # One-liner on a brand-new Mac (keeps the interactive prompts working):
 #   bash <(curl -fsSL https://raw.githubusercontent.com/adrianolisboa/macforge/master/bootstrap.sh)
 #
-# Non-interactive:
-#   bash <(curl -fsSL .../bootstrap.sh) --yes
-#
 # Overridable:
-#   MACFORGE_REPO_URL   (default: https clone of adrianolisboa/macforge)
-#   MACFORGE_DEST       (default: ~/Projects/macforge)
+#   MACFORGE_GH  (default: adrianolisboa/macforge)
 
 set -euo pipefail
 
-REPO_URL="${MACFORGE_REPO_URL:-https://github.com/adrianolisboa/macforge.git}"
-DEST="${MACFORGE_DEST:-$HOME/Projects/macforge}"
+GH_REPO="${MACFORGE_GH:-adrianolisboa/macforge}"
 
 log() { printf '[bootstrap] %s\n' "$1"; }
 die() { printf '[bootstrap] error: %s\n' "$1" >&2; exit 1; }
 
 [[ "$(uname -s)" == "Darwin" ]] || die "This bootstrap targets macOS only."
 
-# 1. Xcode Command Line Tools (provides git).
+# 1. Xcode Command Line Tools (provides git, needed by chezmoi to clone).
 if ! xcode-select -p >/dev/null 2>&1; then
   log "Installing Xcode Command Line Tools (a dialog may appear)..."
   xcode-select --install || true
@@ -31,17 +28,12 @@ if ! xcode-select -p >/dev/null 2>&1; then
   until xcode-select -p >/dev/null 2>&1; do sleep 5; done
 fi
 
-# 2. Clone (or update) macforge. HTTPS so it works before any SSH key exists.
-if [[ -d "$DEST/.git" ]]; then
-  log "macforge already present at $DEST — pulling latest."
-  git -C "$DEST" pull --ff-only || log "Could not fast-forward; continuing with existing checkout."
+# 2. Install chezmoi (if needed) and init+apply in one step.
+#    chezmoi asks "Is this a work machine?" on first init, then applies everything.
+if command -v chezmoi >/dev/null 2>&1; then
+  log "chezmoi present — running init --apply $GH_REPO"
+  exec chezmoi init --apply "$GH_REPO"
 else
-  log "Cloning macforge into $DEST"
-  mkdir -p "$(dirname "$DEST")"
-  git clone "$REPO_URL" "$DEST"
+  log "Installing chezmoi and applying $GH_REPO"
+  exec sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply "$GH_REPO"
 fi
-
-# 3. Run setup (passes through any flags, e.g. --yes).
-cd "$DEST"
-log "Running ./macforge setup"
-exec ./macforge setup "$@"
