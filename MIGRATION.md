@@ -147,7 +147,7 @@ Auth is NOT in that repo — set up per machine:
 ## 6. Apps to reinstall manually (optional)
 
 The Brewfile installs the personal CLI baseline + these casks (1password-cli,
-font-inter, macdown, ngrok, notunes, wkhtmltopdf). Anything else you want
+font-inter, macdown, ngrok, notunes). Anything else you want
 (ChatGPT, work apps via MDM/workbrew, etc.) reinstall as needed.
 
 ---
