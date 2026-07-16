@@ -138,8 +138,8 @@ git clone git@github.com:adrianolisboa/claude-config.git ~/Projects/claude-confi
 ~/Projects/claude-config/install.sh   # symlinks the config into ~/.claude (backs up existing)
 ```
 
-Secrets are NOT in that repo — restore them per machine:
-- Anthropic API key → 1Password / macOS Keychain (not a file in git)
+Auth is NOT in that repo — set up per machine:
+- Claude Code → run `claude` and log in (user auth; no API key to manage)
 - MCP server tokens (`~/.claude.json`) → re-authenticate: run `claude`, then `/mcp`
 
 ---
