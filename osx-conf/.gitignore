@@ -1,2 +1,5 @@
 private/
 .DS_Store
+# A real secrets.env (op:// references or otherwise) must never be committed;
+# only secrets.env.example is tracked.
+secrets.env

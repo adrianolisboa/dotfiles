@@ -72,15 +72,25 @@ The Neovim config is stowed from `nvim/.config/nvim` to `~/.config/nvim` (lazy.n
 
 ## Secrets
 
-Keep secrets out of git and out of plaintext shell exports:
+Two supported approaches — both keep secrets out of git:
+
+**Recommended — 1Password references (no plaintext on disk).** Copy the reference
+template and fill in `op://` references, then run tools through the `oprun` helper
+so 1Password injects real values only at runtime:
+
+```bash
+cp osx-conf/secrets.env.example "$HOME/.config/macforge/secrets.env"
+# edit it: VAR=op://Vault/Item/field   (Copy Secret Reference from the 1Password app)
+oprun mix phx.server        # runs with secrets injected; nothing secret hits disk
+```
+
+**Legacy — machine-local file.** Still supported; sourced at the end of `.zshrc`:
 
 ```bash
 mkdir -p "$HOME/.config/macforge"
 touch "$HOME/.config/macforge/secrets.zsh"
-chmod 600 "$HOME/.config/macforge/secrets.zsh"
+chmod 600 "$HOME/.config/macforge/secrets.zsh"   # shell refuses to source it otherwise
 ```
-
-Then place private exports in that file (for example API keys).
 
 ## Work / professional git identity
 

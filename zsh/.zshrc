@@ -7,6 +7,13 @@ LOAD_ROOT="$HOME/Projects/macforge/osx-conf"
 # fzf
 command -v fzf >/dev/null 2>&1 && eval "$(fzf --zsh)"
 
+# zoxide — smarter cd: `z <name>` jumps by frecency, `zi` picks interactively.
+# Coexists with the gg function; retire gg once zoxide has learned your dirs. Guarded: no-ops until installed.
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+
+# atuin — shell history across all panes (sync off by default). Ctrl-R only; keeps normal up-arrow.
+command -v atuin >/dev/null 2>&1 && eval "$(atuin init zsh --disable-up-arrow)"
+
 # PATH (highest priority first)
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="/opt/homebrew/bin:$PATH"

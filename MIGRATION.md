@@ -107,12 +107,13 @@ commit them.
 
 | What | Path | How to restore |
 |------|------|----------------|
-| **Private shell exports** | `~/.config/macforge/secrets.zsh` | Copy from old Mac (or 1Password). `chmod 600` — the shell refuses to source it otherwise. Sourced at the end of `.zshrc`. |
+| **SSH keys + git signing** | 1Password (recommended) or `~/.ssh/*` | Best: enable the **1Password SSH agent** (1Password → Settings → Developer → "Use the SSH Agent") — keys stay in 1Password, nothing to copy, and it signs commits too. Fallback: copy `~/.ssh/adriano_github`, `github_personal`, `id_ed25519`, `id_ed25519_gitlab` (+ `.pub`) and `chmod 600` the private keys. |
+| **Secrets / tokens** | `~/.config/macforge/secrets.env` (refs) or `secrets.zsh` (legacy) | Recommended: `cp osx-conf/secrets.env.example ~/.config/macforge/secrets.env`, fill in `op://` references, run tools via `oprun`. Legacy: restore `secrets.zsh` (chmod 600), sourced by `.zshrc`. |
 | **Work git identity** | `~/.gitconfig-professional` | Recreate by hand (holds your work name/email). Auto-included for repos under `~/Projects/`. Template below. |
-| **SSH keys** | `~/.ssh/adriano_github`, `github_personal`, `id_ed25519`, `id_ed25519_gitlab` (+ `.pub`) | Copy from old Mac or generate new ones and re-register with GitHub/GitLab. `chmod 600` the private keys. |
 
-The shell auto-runs `ssh-add ~/.ssh/adriano_github` on first interactive login;
-make sure that key exists (or update the name in `osx-conf/common/exports`).
+If you use plain SSH key files (not the 1Password agent), the shell auto-runs
+`ssh-add ~/.ssh/adriano_github` on first interactive login; make sure that key
+exists (or update the name in `osx-conf/common/exports`).
 
 **`~/.gitconfig-professional` template** (fill in your real work values):
 

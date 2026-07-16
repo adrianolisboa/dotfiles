@@ -11,3 +11,26 @@ brew "htop"
 brew "ripgrep"
 brew "fd"
 brew "tldr"
+brew "zoxide"      # smarter cd (frecency); replaces the custom gg
+brew "git-delta"   # readable side-by-side git diffs (git pager)
+brew "atuin"       # shell history across panes (sync off)
+
+# Editor, git, and dev essentials (were installed but not tracked).
+brew "neovim"          # editor (config in nvim/ package)
+brew "gh"              # GitHub CLI (config in gh/ package)
+brew "git-lfs"         # required by .gitconfig lfs filter
+brew "gitleaks"        # required by the pre-push secret-scan hook
+brew "direnv"          # per-directory env
+brew "gnupg"           # gpg
+brew "mise"            # runtime version manager (node/elixir/erlang/go)
+brew "colima"          # container runtime (docker daemon)
+brew "docker"          # docker CLI
+brew "docker-compose"  # compose plugin
+
+# GUI apps
+cask "1password-cli"   # secrets + SSH agent + git signing
+cask "font-inter"
+cask "macdown"
+cask "ngrok"
+cask "notunes"
+cask "wkhtmltopdf"

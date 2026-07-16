@@ -6,3 +6,8 @@ brew "pass"
 brew "thefuck"
 brew "prettyping"
 brew "the_silver_searcher"
+brew "just"          # task runner
+brew "httpie"        # friendly HTTP client
+brew "yq"            # YAML processor (jq for YAML)
+brew "ctags"         # code tag indexing (~/.ctags)
+brew "gemini-cli"    # Google Gemini CLI
