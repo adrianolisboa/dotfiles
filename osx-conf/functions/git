@@ -27,21 +27,6 @@ git_default_branch() {
   printf '%s\n' "main"
 }
 
-# fuzzy commit selecting
-# Thanks to: https://github.com/christoomey/dotfiles/blob/77fb4084bd3f207aace80aa93a49769a6a298ddb/bin/git-shalector
-git-shalector() {
-  local target_commit
-  target_commit="$(
-    git log -75 --oneline --decorate --graph --all --color=always | \
-    fzf --ansi --no-sort --reverse --tiebreak=index | \
-    sed -E 's/.* ([0-9a-f]{7}) .*/\1/' | \
-    tr -d '\n'
-  )"
-
-  printf '%s' "$target_commit" | pbcopy
-  echo "Commit hash copied ($target_commit)"
-}
-
 delete_local_merged_branches() {
   local base branch
   base="$(git_default_branch)"
@@ -94,25 +79,4 @@ git_update_all() {
     cd "$cur_dir" || return 1
   done
   echo "Done."
-}
-
-git-author() {
-  local args
-  args=("$@")
-
-  case "${1:-}" in
-    set)
-      export GIT_AUTHOR_NAME="${args[*]:1}"
-      ;;
-    unset)
-      unset GIT_AUTHOR_NAME
-      ;;
-    show|get)
-      echo "Current author: ${GIT_AUTHOR_NAME:-$(git config --get user.name)}"
-      ;;
-    *)
-      echo "Usage git-author [set AUTHOR|unset|show|get]"
-      git-author show
-      ;;
-  esac
 }
