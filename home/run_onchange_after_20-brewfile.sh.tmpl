@@ -2,9 +2,9 @@
 set -euo pipefail
 
 # Re-runs automatically whenever the Brewfile changes (hash below).
-# Brewfile hash: {{ include "dot_config/macforge/osx-conf/Brewfile" | sha256sum }}
+# Brewfile hash: {{ include "dot_config/macforge/Brewfile" | sha256sum }}
 
-BREWFILE="$HOME/.config/macforge/osx-conf/Brewfile"
+BREWFILE="$HOME/.config/macforge/Brewfile"
 BREW="$(command -v brew 2>/dev/null || true)"
 [ -n "$BREW" ] || { for b in /opt/workbrew/bin/brew /opt/homebrew/bin/brew; do [ -x "$b" ] && BREW="$b" && break; done; }
 [ -n "$BREW" ] || { echo "[brew_bundle] brew not found — skipping"; exit 0; }
@@ -12,4 +12,4 @@ BREW="$(command -v brew 2>/dev/null || true)"
 
 echo "[brew_bundle] installing from $BREWFILE"
 "$BREW" bundle --file="$BREWFILE"
-echo "[brew_bundle] optional set available via: $BREW bundle --file=$HOME/.config/macforge/osx-conf/Brewfile.optional"
+echo "[brew_bundle] optional set available via: $BREW bundle --file=$HOME/.config/macforge/Brewfile.optional"

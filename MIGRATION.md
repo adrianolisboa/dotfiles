@@ -69,7 +69,7 @@ What happens:
 | Script | What it does |
 |--------|--------------|
 | `run_once_before_10-homebrew` | Install Homebrew if no brew present (skips if workbrew/homebrew exists) |
-| `run_onchange_after_20-brewfile` | `brew bundle` from `~/.config/macforge/osx-conf/Brewfile` (re-runs when it changes) |
+| `run_onchange_after_20-brewfile` | `brew bundle` from `~/.config/macforge/Brewfile` (re-runs when it changes) |
 | `run_onchange_after_30-macos-defaults` | Dark mode, key repeat, Finder, Dock autohide |
 | `run_once_after_40-iterm2` | Point iTerm2 at the tracked prefs folder |
 | `run_once_after_50-git-hooks` | Install gitleaks pre-push + docs-sync pre-commit |
@@ -81,7 +81,7 @@ chezmoi diff                     # preview before applying
 chezmoi apply --exclude=scripts  # dotfiles only (skip brew/defaults)
 chezmoi doctor                   # health check
 chezmoi update                   # git pull + apply (sync from another machine)
-brew bundle --file ~/.config/macforge/osx-conf/Brewfile.optional   # optional tools
+brew bundle --file ~/.config/macforge/Brewfile.optional   # optional tools
 ```
 
 Edit a managed file directly (it's a symlink into the repo) or via
@@ -96,12 +96,12 @@ Kept out of git deliberately. Transfer securely (1Password / regenerate); never 
 | What | How to restore |
 |------|----------------|
 | **SSH keys + git signing** | Best: enable the **1Password SSH agent** (1Password → Settings → Developer → "Use the SSH Agent") — keys stay in 1Password, nothing to copy, signs commits too. Fallback: copy `~/.ssh/adriano_github`, `github_personal`, `id_ed25519`, `id_ed25519_gitlab` (+ `.pub`), `chmod 600` the private keys. |
-| **Secrets / tokens** | Recommended: `cp ~/.config/macforge/osx-conf/secrets.env.example ~/.config/macforge/secrets.env`, fill in `op://` references, run tools via `oprun`. Legacy: restore `~/.config/macforge/secrets.zsh` (chmod 600). |
+| **Secrets / tokens** | Recommended: `cp ~/.config/macforge/secrets.env.example ~/.config/macforge/secrets.env`, fill in `op://` references, run tools via `oprun`. Legacy: restore `~/.config/macforge/secrets.zsh` (chmod 600). |
 | **Work git identity** | Answer "work machine? = yes" at `chezmoi init` and it renders `~/.gitconfig-professional` from your prompt answers. (Or restore the file by hand.) |
 
 If you use plain SSH key files (not the 1Password agent), the shell auto-runs
 `ssh-add ~/.ssh/adriano_github` on first login — make sure that key exists (or
-update the name in `osx-conf/common/exports`).
+update the name in `shell/common/exports`).
 
 ---
 

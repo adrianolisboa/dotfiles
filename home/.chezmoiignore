@@ -2,5 +2,5 @@
 {{ if not .work }}
 .gitconfig-professional
 {{ end }}
-{{- /* osx-conf's own repo docs/ignore don't belong in ~/.config */ -}}
-.config/macforge/osx-conf/README.md
+{{- /* the shell loader's repo README doesn't belong in ~/.config */ -}}
+.config/macforge/shell/README.md

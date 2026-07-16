@@ -20,7 +20,8 @@ home/
   .chezmoiignore                   # skip .gitconfig-professional on non-work machines
   dot_zshrc dot_gitconfig …        # dotfiles: dot_ → ~/.  (symlinked in symlink mode)
   dot_config/{nvim,gh,atuin}       # → ~/.config/*
-  dot_config/macforge/osx-conf/    # shell loader (aliases/ common/ functions/ optional/) + Brewfile(.optional) + iterm2/
+  dot_config/macforge/shell/       # zsh loader (load + aliases/ common/ functions/ optional/)
+  dot_config/macforge/{bin,iterm2,Brewfile,Brewfile.optional,secrets.env.example}
   dot_gitconfig-professional.tmpl  # work identity, rendered from prompt data (never a secret in the repo)
   run_once_* / run_onchange_*      # setup scripts (homebrew, brewfile, macos defaults, iterm2, git-hooks)
 scripts/install-git-hooks.sh       # gitleaks pre-push + docs-sync pre-commit
@@ -57,7 +58,7 @@ happen here.
    Work-specific values belong in prompt data / 1Password templates, not literals.
 3. **Symlink-mode gotcha:** anything sourced by iterating a directory must follow
    symlinks (`find -L`, not `find -type f`) — module files under
-   `~/.config/macforge/osx-conf` are symlinks.
+   `~/.config/macforge/shell` are symlinks.
 4. **Verify before committing:** `chezmoi diff` clean/expected, shell loads,
    nvim loads (below). No `chezmoi doctor` failures.
 5. **Commits:** Conventional Commits (`feat:`/`fix:`/`chore:`/`docs:` …),

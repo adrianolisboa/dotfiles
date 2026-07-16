@@ -37,7 +37,9 @@ home/
   .chezmoi.toml.tmpl         prompts (work machine?) + symlink mode
   .chezmoiignore             skip work identity on non-work machines
   dot_zshrc, dot_gitconfig…  dotfiles (dot_ → ~/.)
-  dot_config/nvim, gh, atuin, macforge/osx-conf   → ~/.config/*
+  dot_config/nvim, gh, atuin                      → ~/.config/{nvim,gh,atuin}
+  dot_config/macforge/shell                       → ~/.config/macforge/shell (zsh loader)
+  dot_config/macforge/{bin,iterm2,Brewfile*}      → ~/.config/macforge/* (scripts, iTerm2, packages)
   dot_gitconfig-professional.tmpl                 work identity (rendered from prompt)
   run_once_* / run_onchange_*                     setup scripts
 scripts/install-git-hooks.sh                      gitleaks + docs-sync hooks
@@ -58,14 +60,14 @@ chezmoi init                  # re-run prompts (e.g. to flip work machine)
 
 ## Brewfile
 
-- `home/dot_config/macforge/osx-conf/Brewfile` → applied to `~/.config/macforge/osx-conf/Brewfile`.
+- `home/dot_config/macforge/Brewfile` → applied to `~/.config/macforge/Brewfile`.
 - A `run_onchange` script re-runs `brew bundle` automatically whenever it changes.
-- Optional set: `brew bundle --file ~/.config/macforge/osx-conf/Brewfile.optional`.
+- Optional set: `brew bundle --file ~/.config/macforge/Brewfile.optional`.
 
 ## Shell configuration
 
-`~/.zshrc` sources `~/.config/macforge/osx-conf/load`, which pulls in everything
-under `osx-conf/{aliases,common,functions,optional}`. Machine-local/private
+`~/.zshrc` sources `~/.config/macforge/shell/load`, which pulls in everything
+under `shell/{aliases,common,functions,optional}`. Machine-local/private
 config belongs in `~/.config/macforge/secrets.zsh` (sourced at the end if present).
 
 ## Neovim
@@ -84,7 +86,7 @@ tracked — run `gh auth login` per machine.
 references and run tools through the `oprun` helper:
 
 ```bash
-cp ~/.config/macforge/osx-conf/secrets.env.example "$HOME/.config/macforge/secrets.env"
+cp ~/.config/macforge/secrets.env.example "$HOME/.config/macforge/secrets.env"
 # edit it: VAR=op://Vault/Item/field   (Copy Secret Reference from the 1Password app)
 oprun mix phx.server        # secrets injected at runtime, nothing on disk
 ```

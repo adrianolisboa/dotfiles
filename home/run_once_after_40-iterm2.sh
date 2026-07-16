@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PLIST_DIR="$HOME/.config/macforge/osx-conf/iterm2"
+PLIST_DIR="$HOME/.config/macforge/iterm2"
 if [ ! -f "$PLIST_DIR/com.googlecode.iterm2.plist" ]; then
   echo "[iterm2] plist missing at $PLIST_DIR — skipping"
   exit 0
