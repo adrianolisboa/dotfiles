@@ -12,6 +12,14 @@ macforge now includes the Neovim config too (it used to be a separate
 
 ## TL;DR
 
+One command on a brand-new Mac (installs Xcode CLT, clones macforge, runs setup):
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/adrianolisboa/macforge/master/bootstrap.sh)
+```
+
+Or manually:
+
 ```bash
 mkdir -p "$HOME/Projects" && cd "$HOME/Projects"
 git clone git@github.com:adrianolisboa/macforge.git   # or https:// if no key yet

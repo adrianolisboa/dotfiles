@@ -6,6 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 HOOKS_DIR="$REPO_ROOT/.git/hooks"
 PRE_PUSH_HOOK="$HOOKS_DIR/pre-push"
+PRE_COMMIT_HOOK="$HOOKS_DIR/pre-commit"
 
 mkdir -p "$HOOKS_DIR"
 
@@ -61,3 +62,27 @@ HOOK
 
 chmod +x "$PRE_PUSH_HOOK"
 echo "Installed pre-push hook: $PRE_PUSH_HOOK"
+
+# Non-blocking reminder: keep MIGRATION.md / README.md in sync with managed config.
+cat > "$PRE_COMMIT_HOOK" <<'HOOK'
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+staged="$(git diff --cached --name-only)"
+
+# Paths whose changes may affect how a new Mac is set up.
+config_re='^(zsh/|git/|tmux/|input/|nvim/|gh/|osx-conf/|scripts/|config/macforge\.sh|bootstrap\.sh)'
+docs_re='^(MIGRATION\.md|README\.md)$'
+
+if grep -qE "$config_re" <<<"$staged" && ! grep -qE "$docs_re" <<<"$staged"; then
+  echo "⚠ macforge: you changed managed config but not MIGRATION.md / README.md." >&2
+  echo "  If this changes how a new Mac is set up, update them too (see AGENTS.md)." >&2
+  echo "  (reminder only — commit proceeds)" >&2
+fi
+
+exit 0
+HOOK
+
+chmod +x "$PRE_COMMIT_HOOK"
+echo "Installed pre-commit hook: $PRE_COMMIT_HOOK"

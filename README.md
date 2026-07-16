@@ -5,7 +5,15 @@ Personal macOS bootstrap + dotfiles + shell tooling in one place.
 Stow packages: `git`, `zsh`, `input`, `tmux`, `nvim`, `gh`. One `./macforge setup`
 symlinks all of them, installs Homebrew tools, and applies macOS defaults.
 
-## One command setup
+## Fresh Mac — one command
+
+On a brand-new Mac (installs Xcode CLT, clones this repo, runs setup):
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/adrianolisboa/macforge/master/bootstrap.sh)
+```
+
+Already cloned:
 
 ```bash
 cd "$HOME/Projects/macforge"
@@ -13,6 +21,11 @@ cd "$HOME/Projects/macforge"
 ```
 
 That command orchestrates all phases, saves progress, and can pause between phases.
+
+## Working in this repo
+
+Agent + contributor rules (including "keep MIGRATION.md in sync") live in
+[AGENTS.md](AGENTS.md). New-Mac migration steps live in [MIGRATION.md](MIGRATION.md).
 
 ## Setup behavior
 
@@ -99,12 +112,13 @@ macforge is the source of truth for your config. To keep other machines in sync:
 
 After a `git pull`, running `./macforge setup` skips phases already completed (state is in `~/.local/state/macforge/setup.state`).
 
-## Security hook
-
-Install a pre-push hook that runs `gitleaks`:
+## Git hooks
 
 ```bash
 ./macforge hooks
 ```
 
-The hook blocks push if potential secrets are detected in the outgoing commit range.
+Installs two hooks:
+
+- **pre-push** — runs `gitleaks`; blocks the push if potential secrets are detected in the outgoing commit range.
+- **pre-commit** — non-blocking reminder to update `MIGRATION.md` / `README.md` when you commit changes to managed config.

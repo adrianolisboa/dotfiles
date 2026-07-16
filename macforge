@@ -14,7 +14,7 @@ Usage:
 Commands:
   setup         Run full macforge setup (with checkpoints)
   doctor        Validate local macforge shell/setup health
-  hooks         Install git hooks (pre-push gitleaks scan)
+  hooks         Install git hooks (pre-push gitleaks scan + pre-commit docs reminder)
   phases        List setup phases
   help          Show this help
 
