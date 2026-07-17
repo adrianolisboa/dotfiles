@@ -23,6 +23,7 @@ brew "gitleaks"        # required by the pre-push secret-scan hook
 brew "direnv"          # per-directory env
 brew "gnupg"           # gpg
 brew "mise"            # runtime version manager (node/elixir/erlang/go)
+brew "chezmoi"         # dotfile manager for this repo; puts `chezmoi update` on PATH
 brew "colima"          # container runtime (docker daemon)
 brew "docker"          # docker CLI
 brew "docker-compose"  # compose plugin
@@ -33,3 +34,29 @@ cask "font-inter"
 cask "macdown"
 cask "ngrok"
 cask "notunes"
+
+# Dev & AI tools
+cask "alfred"
+cask "bartender"
+cask "cursor"
+cask "zed"
+cask "claude"
+cask "chatgpt"
+cask "codex"
+cask "obsidian"
+cask "insomnia"
+cask "tableplus"
+cask "table-tool"
+
+# Utilities & media
+cask "shottr"
+cask "xnapper"
+cask "superwhisper"
+cask "wispr-flow"
+cask "flux"
+cask "gimp"
+cask "textexpander"
+cask "languagetool"
+cask "todoist"
+cask "spotify"
+cask "google-drive"
