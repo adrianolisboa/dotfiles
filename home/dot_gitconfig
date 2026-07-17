@@ -4,6 +4,8 @@
     path = .gitconfig-professional
 [includeIf "gitdir:~/Projects/macforge/"]
     path = .gitconfig-personal
+[includeIf "gitdir:~/.local/share/chezmoi/"]
+    path = .gitconfig-personal
 [includeIf "gitdir:~/.vim/"]
     path = .gitconfig-personal
 [color]

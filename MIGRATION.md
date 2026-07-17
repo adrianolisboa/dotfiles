@@ -41,7 +41,9 @@ Open Claude Code on the new Mac and paste:
 ## 1. Prerequisites
 
 - **macOS** (Apple Silicon assumed; paths use `/opt/homebrew`).
-- **Xcode CLT** + **chezmoi** — the bootstrap one-liner installs both.
+- **Xcode CLT** + **chezmoi** — the bootstrap one-liner installs both. chezmoi
+  goes to `~/.local/bin` (on PATH) and is also in the Brewfile, so `chezmoi
+  update` keeps working after setup.
 - ⚠️ **Work Mac:** a company-managed Mac may ship with **workbrew** at
   `/opt/workbrew/bin/brew`, which manages mandatory formulae. macforge's Brewfile
   is a small personal baseline and the run script uses whichever `brew` is on
@@ -70,7 +72,7 @@ What happens:
 |--------|--------------|
 | `run_once_before_10-homebrew` | Install Homebrew if no brew present (skips if workbrew/homebrew exists) |
 | `run_onchange_after_20-brewfile` | `brew bundle` from `~/.config/macforge/Brewfile` (re-runs when it changes) |
-| `run_onchange_after_30-macos-defaults` | Dark mode, key repeat, Finder, Dock autohide |
+| `run_onchange_after_30-macos-defaults` | Dark mode, key repeat, Finder, Dock autohide, free Ctrl-Space for the tmux prefix (disable macOS input-source hotkeys) |
 | `run_once_after_40-iterm2` | Point iTerm2 at the tracked prefs folder |
 | `run_once_after_50-git-hooks` | Install gitleaks pre-push + docs-sync pre-commit |
 | `run_once_after_60-claude-code` | Install Claude Code via the native installer (if missing) |
