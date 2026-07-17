@@ -28,21 +28,41 @@ if ! xcode-select -p >/dev/null 2>&1; then
   until xcode-select -p >/dev/null 2>&1; do sleep 5; done
 fi
 
-# 2. Install chezmoi (if needed), then bring the machine up to date.
-#    chezmoi asks "Is this a work machine?" on first init, then applies everything.
-#    `chezmoi init` only clones when the source is absent — it does NOT pull an
-#    existing clone. So if the repo is already there, re-running this bootstrap
-#    would re-apply a stale copy. Detect that case and `chezmoi update` (git pull
-#    --autostash --rebase + apply) so re-runs always sync to the latest master.
-if command -v chezmoi >/dev/null 2>&1; then
-  SRC="$(chezmoi source-path 2>/dev/null || true)"
-  if [ -n "$SRC" ] && git -C "$SRC" rev-parse --git-dir >/dev/null 2>&1; then
-    log "chezmoi source already present — pulling latest and applying (chezmoi update)"
-    exec chezmoi update
+# 2. Ensure chezmoi is installed AND on PATH for this run. get.chezmoi.io drops
+#    the binary in ./bin (not on PATH), which is why `chezmoi update` came back
+#    "command not found". Install it to ~/.local/bin and prepend that. (chezmoi is
+#    also in the Brewfile, so brew bundle later puts it on the permanent PATH.)
+if ! command -v chezmoi >/dev/null 2>&1; then
+  export PATH="$HOME/.local/bin:$PATH"
+  if ! command -v chezmoi >/dev/null 2>&1; then
+    log "Installing chezmoi to ~/.local/bin"
+    sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
   fi
-  log "chezmoi present — running init --apply $GH_REPO"
-  exec chezmoi init --apply "$GH_REPO"
-else
-  log "Installing chezmoi and applying $GH_REPO"
-  exec sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply "$GH_REPO"
 fi
+
+# 3. Apply the repo. `chezmoi init` clones only when the source is absent — it
+#    never pulls an existing clone, so a re-run would otherwise re-apply a stale
+#    copy (the reason a manual `rm -rf` was ever needed). If a clone already
+#    exists, fast-forward it to the remote and apply — so re-running this
+#    bootstrap self-heals, no rm -rf. If it has diverged or has local changes we
+#    refuse rather than discard work.
+#    chezmoi asks "Is this a work machine?" on first init, then applies everything.
+SRC="$(chezmoi source-path 2>/dev/null || true)"
+ROOT=""
+[ -n "$SRC" ] && ROOT="$(git -C "$SRC" rev-parse --show-toplevel 2>/dev/null || true)"
+
+if [ -z "$ROOT" ]; then
+  log "fresh install — init --apply $GH_REPO"
+  exec chezmoi init --apply "$GH_REPO"
+fi
+
+if [ -n "$(git -C "$ROOT" status --porcelain)" ]; then
+  die "clone at $ROOT has local changes — commit or stash them, then run 'chezmoi update' (no rm -rf needed)."
+fi
+
+log "existing clone at $ROOT — fast-forwarding to latest remote, then applying"
+git -C "$ROOT" fetch --prune origin
+UPSTREAM="$(git -C "$ROOT" rev-parse --abbrev-ref '@{u}' 2>/dev/null || echo origin/master)"
+git -C "$ROOT" merge --ff-only "$UPSTREAM" \
+  || die "clone at $ROOT has diverged from $UPSTREAM — run 'chezmoi update' or re-clone; not touching it automatically."
+exec chezmoi apply
