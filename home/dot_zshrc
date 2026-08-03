@@ -16,7 +16,12 @@ command -v atuin >/dev/null 2>&1 && eval "$(atuin init zsh --disable-up-arrow)"
 
 # PATH (highest priority first)
 export PATH="$HOME/.local/bin:$PATH"
-export PATH="/opt/homebrew/bin:$PATH"
+# Homebrew (workbrew wrapper takes priority on managed machines)
+if [ -d /opt/workbrew/bin ]; then
+  export PATH="/opt/workbrew/bin:/opt/homebrew/bin:$PATH"
+else
+  export PATH="/opt/homebrew/bin:$PATH"
+fi
 export PATH="/opt/homebrew/opt/openssl@1.1/bin:$PATH"
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 export PATH="$HOME/.local/share/mise/shims:$PATH"
